@@ -1,0 +1,3 @@
+.venv
+.vscode
+communities/config/mongo.py
