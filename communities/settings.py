@@ -14,18 +14,27 @@ BOT_NAME = 'communities'
 SPIDER_MODULES = ['communities.spiders']
 NEWSPIDER_MODULE = 'communities.spiders'
 
-from communities.config.mongo import MONGO_URI
-from communities.config.mongo import MONGO_DATABASE
-
 FEED_EXPORT_ENCODING = 'utf-8'
 
 LOG_LEVEL = 'INFO'
+
+DOWNLOAD_DELAY = 5
+
+ROBOTSTXT_OBEY = False
+
+from communities.config.mongo import MONGO_URI, MONGO_DATABASE
+
+DOWNLOADER_MIDDLEWARES = {
+   'communities.middlewares.SeleniumMiddleware': 200,
+}
+ITEM_PIPELINES = {
+   'communities.pipelines.MongoPipeline': 300,
+}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'communities (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -33,13 +42,12 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-#COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -62,13 +70,6 @@ ROBOTSTXT_OBEY = False
 #DOWNLOADER_MIDDLEWARES = {
 #    'communities.middlewares.CommunitiesDownloaderMiddleware': 543,
 #}
-
-DOWNLOADER_MIDDLEWARES = {
-   'communities.middlewares.SeleniumMiddleware': 200,
-}
-ITEM_PIPELINES = {
-   'communities.pipelines.MongoPipeline': 300,
-}
 
 
 # Enable or disable extensions

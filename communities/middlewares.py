@@ -6,6 +6,7 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 import os
+import time
 
 from scrapy import signals
 from scrapy.http import HtmlResponse
@@ -118,13 +119,22 @@ class SeleniumMiddleware(object):
         crawler.signals.connect(middleware.spider_closed, signals.spider_closed)
         return middleware
 
-    def process_request(self, request, spider):
-        
-        print( 'process_request => ', request.url )
+    def process_request( self, request, spider ):
+        print( f'cookies => { request.cookies }' )
+
         request.meta['driver'] = self.driver  # to access driver from response
 
         self.driver.get( request.url )
-        body = to_bytes( self.driver.page_source )  # body must be of type bytes
+
+        for cookie in request.cookies:
+            self.driver.add_cookie( cookie )
+
+        from pprint import pprint
+        pprint( self.driver.get_cookies() )
+
+        body = to_bytes( text=self.driver.page_source )  # body must be of type bytes
+
+        time.sleep( 1 )
         
         return HtmlResponse(self.driver.current_url, body=body, encoding='utf-8', request=request)
 
