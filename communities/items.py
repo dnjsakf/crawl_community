@@ -7,8 +7,11 @@
 
 import scrapy
 
-
-class CommunitiesItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class YgosuItem(scrapy.Item):
+    cate = scrapy.Field()
+    no = scrapy.Field(serializer=int)
+    tit = scrapy.Field()
+    name = scrapy.Field()
+    read = scrapy.Field()
+    href = scrapy.Field()
+    load_dttm = scrapy.Field(serializer=str)

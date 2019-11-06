@@ -15,14 +15,12 @@ SPIDER_MODULES = ['communities.spiders']
 NEWSPIDER_MODULE = 'communities.spiders'
 
 FEED_EXPORT_ENCODING = 'utf-8'
-
 LOG_LEVEL = 'INFO'
-
 DOWNLOAD_DELAY = 5
-
 ROBOTSTXT_OBEY = False
+COOKIES_ENABLED = True
 
-from communities.config.mongo import MONGO_URI, MONGO_DATABASE
+from communities.config import MONGO_URI, MONGO_DATABASE
 
 DOWNLOADER_MIDDLEWARES = {
    'communities.middlewares.SeleniumMiddleware': 200,
@@ -45,9 +43,6 @@ ITEM_PIPELINES = {
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
-
-# Disable cookies (enabled by default)
-COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
