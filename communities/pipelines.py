@@ -17,7 +17,7 @@ class MongoPipeline(object):
             mongo_db = crawler.settings.get('MONGO_DATABASE', 'items')
         )
 
-    def open_spider(self, spider):
+    def open_spider(self, spider, *args, **kwargs):
         self.client = pymongo.MongoClient( self.mongo_uri )
 
         self.db = self.client[ self.mongo_db ][ spider.collection ]

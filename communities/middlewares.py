@@ -26,17 +26,16 @@ class SeleniumMiddleware(object):
         # with open('./cookies.pkl', 'wb') as writor:
         #     pickle.dump( request.cookies, writor )
 
-        # 쿠키 가져오기
-        with open('./communities/config/cookies.pkl', 'rb') as reader:
-            cookies = pickle.load(reader)
-        print( f'cookies => { cookies }' )
-
         request.meta['driver'] = self.driver  # to access driver from response
-
+        
         self.driver.get( request.url )
 
         parsedUrl = urlparse( self.driver.current_url )
         if parsedUrl.path == spider.loginPath:
+            # 쿠키 가져오기
+            with open('./communities/config/cookies.pkl', 'rb') as reader:
+                cookies = pickle.load(reader)
+            print( f'cookies => { cookies }' )
             print( f'Need to login => { parsedUrl.path }' )
             for cookie in cookies:
                 self.driver.add_cookie( cookie )

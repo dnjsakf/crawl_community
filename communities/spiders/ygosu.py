@@ -8,16 +8,27 @@ from scrapy.http import HtmlResponse
 from datetime import datetime as dt
 from communities.items import YgosuItem
 
+from pprint import pprint
+
 class YgosuSpider(scrapy.Spider):
     name = 'ygosu'
     allowed_domains = ['www.ygosu.com']
     
     def __init__( self, *args, **kargs ):
+        '''
+            request_data is scrapyrt.Resources.CrawlResource.prepare_crawl에서 받아옴
+        '''
         super(YgosuSpider, self).__init__( *args, **kargs )
 
+        pprint( '='*50 )
+        pprint( kargs['request_data'] if 'request_data' in kargs else [None] )
+        pprint( '='*50 )
+
+        request_data = kargs['request_data'] if 'request_data' in kargs else kargs
+
         self.collection = 'ygosu'
-        self.cate = kargs['cate'] if 'cate' in kargs else 'yeobgi'
-        self.page = kargs['page'] if 'page' in kargs else 1
+        self.cate = request_data['cate'] if 'cate' in request_data else 'yeobgi'
+        self.page = request_data['page'] if 'page' in request_data else 1
 
         self.homeUrl = 'https://www.ygosu.com'
         self.loginPath = '/login/common_login.yg'
@@ -25,11 +36,11 @@ class YgosuSpider(scrapy.Spider):
         self.start_urls = [
             f'{ self.homeUrl }/community/{ self.cate }/?page={ self.page }'
         ]
-    
+
     def start_requests( self ):
         for url in self.start_urls:
             print( f'request_url => { url }' )
-            yield scrapy.Request( url, callback=self.parse_data)
+            yield scrapy.Request( url, callback=self.parse_data )
 
     def parse_data( self, response ):
         print( f'after_response => { response }' )

@@ -1,3 +1,4 @@
 communities/config/*
+logs
 .venv
 .vscode
