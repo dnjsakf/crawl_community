@@ -7,11 +7,18 @@
 
 import scrapy
 
-class YgosuItem(scrapy.Item):
+class ContentItem(scrapy.Item):
+    community = scrapy.Field()
     cate = scrapy.Field()
     no = scrapy.Field(serializer=int)
-    tit = scrapy.Field()
-    name = scrapy.Field()
+    subject = scrapy.Field()
+    author = scrapy.Field()
+    link = scrapy.Field()
     read = scrapy.Field()
-    href = scrapy.Field()
     load_dttm = scrapy.Field(serializer=str)
+
+class YgosuItem(ContentItem):
+    pass
+
+class HumorunivItem(ContentItem):
+    pass

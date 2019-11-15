@@ -13,16 +13,15 @@ from pprint import pprint
 class YgosuSpider(scrapy.Spider):
     name = 'ygosu'
     allowed_domains = ['www.ygosu.com']
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'communities.pipelines.MongoPipeline': 100,
+        }
+    }
     
     def __init__( self, *args, **kargs ):
-        '''
-            request_data is scrapyrt.Resources.CrawlResource.prepare_crawl에서 받아옴
-        '''
         super(YgosuSpider, self).__init__( *args, **kargs )
-
-        pprint( '='*50 )
-        pprint( kargs['request_data'] if 'request_data' in kargs else [None] )
-        pprint( '='*50 )
+        ''' request_data is scrapyrt.Resources.CrawlResource.prepare_crawl에서 받아옴 '''
 
         request_data = kargs['request_data'] if 'request_data' in kargs else kargs
 
@@ -40,9 +39,9 @@ class YgosuSpider(scrapy.Spider):
     def start_requests( self ):
         for url in self.start_urls:
             print( f'request_url => { url }' )
-            yield scrapy.Request( url, callback=self.parse_data )
+            yield scrapy.Request( url, callback=self.parse )
 
-    def parse_data( self, response ):
+    def parse( self, response ):
         print( f'after_response => { response }' )
         contents = response.xpath('//*[@id="contain"]/div[2]/div[1]/div[2]/table/tbody/tr')
 
@@ -51,19 +50,20 @@ class YgosuSpider(scrapy.Spider):
             no = content.xpath('td[@class="no"]/text()').extract_first()
             if not no: continue
             
-            tit = content.xpath('td[@class="tit"]/a/text()').extract_first()
-            name = content.xpath('td[@class="name"]/a/text()').extract_first()
+            subject = content.xpath('td[@class="tit"]/a/text()').extract_first()
+            author = content.xpath('td[@class="name"]/a/text()').extract_first()
             read = content.xpath('td[@class="read"]/text()').extract_first()
-            href = content.xpath('td[@class="tit"]/a/@href').extract_first()
+            link = content.xpath('td[@class="tit"]/a/@href').extract_first()
             load_dttm = dt.now().strftime('%Y%m%d%H%M%S')
 
             item = YgosuItem(
-                cate = self.cate
-                , no = no.strip() if not no else no
-                , tit = tit.strip() if not tit else tit
-                , name = name.strip() if not name else name
-                , read = read.strip() if not read else read
-                , href = self.homeUrl + ( href.strip() if not href else href )
+                community = self.name
+                , cate = self.cate
+                , no = no.strip() if no else no
+                , subject = subject.strip() if subject else subject
+                , author = author.strip() if author else author
+                , read = read.strip() if read else read
+                , link = self.homeUrl + ( link.strip() if link else link )
                 , load_dttm = load_dttm
             )
             

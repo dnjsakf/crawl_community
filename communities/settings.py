@@ -25,9 +25,12 @@ from communities.config import MONGO_URI, MONGO_DATABASE
 DOWNLOADER_MIDDLEWARES = {
    'communities.middlewares.SeleniumMiddleware': 200,
 }
+'''
 ITEM_PIPELINES = {
-   'communities.pipelines.MongoPipeline': 300,
+   'communities.pipelines.MongoPipeline': 100,
+   'communities.pipelines.TestPipeline': 200,
 }
+'''
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'communities (+http://www.yourdomain.com)'

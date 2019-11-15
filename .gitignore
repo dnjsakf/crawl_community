@@ -1,4 +1,8 @@
 communities/config/*
-logs
 .venv
 .vscode
+dbs
+eggs
+logs
+build
+project.egg*

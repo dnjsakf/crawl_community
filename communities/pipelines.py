@@ -1,6 +1,20 @@
 # -*- coding: utf-8 -*-
 import pymongo
 
+from scrapy.exceptions import DropItem
+
+class QueuePipeline(object):
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls()
+
+    def open_spider(self, spider, *args, **kwargs):
+        print( spider )
+
+    def process_item(self, item, spider):
+        raise DropItem('test-pipeline')
+        return item
+
 class MongoPipeline(object):
 
     mongo_uri = None
@@ -28,9 +42,15 @@ class MongoPipeline(object):
     def process_item(self, item, spider):
         try:
             self.db.update(
-                { 'no': item['no'] }
-                , { '$set': dict(item) }
-                , upsert=True )
+                { 
+                    'cate': item['cate']
+                    , 'no': item['no'] 
+                }, 
+                { 
+                    '$set': dict(item) 
+                }, 
+                upsert=True 
+            )
         except Exception as err:
             print( err )
 
