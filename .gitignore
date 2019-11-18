@@ -4,5 +4,7 @@ communities/config/*
 dbs
 eggs
 logs
+files
 build
 project.egg*
+__pycache__

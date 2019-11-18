@@ -22,3 +22,11 @@ class YgosuItem(ContentItem):
 
 class HumorunivItem(ContentItem):
     pass
+
+class ImageItem(scrapy.Item):
+    images = scrapy.Field()
+    image_urls = scrapy.Field()
+    
+class FileItem(scrapy.Item):
+    files = scrapy.Field()
+    file_urls = scrapy.Field()

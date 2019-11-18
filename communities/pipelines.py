@@ -1,18 +1,58 @@
 # -*- coding: utf-8 -*-
+import os
 import pymongo
+import scrapy
 
 from scrapy.exceptions import DropItem
+from scrapy.pipelines.images import ImagesPipeline
+from scrapy.pipelines.files import FilesPipeline
+from scrapy.http import HtmlResponse
+from scrapy.exceptions import DropItem
 
-class QueuePipeline(object):
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls()
+from urllib.request import Request, urlopen
+from urllib.parse  import urlparse
 
-    def open_spider(self, spider, *args, **kwargs):
-        print( spider )
+from pprint import pprint
 
-    def process_item(self, item, spider):
-        raise DropItem('test-pipeline')
+class MediaImagePipeline( ImagesPipeline ):
+    
+    def file_path(self, request, response=None, info=None):
+        return 'images/' + os.path.basename(urlparse(request.url).path) +'.mp4'
+
+    def get_media_requests(self, item, info):
+        for file_url in item['file_urls']:
+            print( f'image_url => {file_url}' )
+            yield scrapy.Request( url=file_url, meta={'mode': 'data'} )
+
+    def item_completed(self, results, item, info):
+        pprint( f'image_completed => {results}' )
+        
+        image_paths = [x['path'] for ok, x in results if ok]
+        if not image_paths:
+            raise DropItem("Item contains no images")
+        item['files'] = image_paths
+        
+        return item
+
+class MediaFilePipeline( FilesPipeline ):
+    
+    def file_path(self, request, response=None, info=None):
+        return 'files/' + os.path.basename(urlparse(request.url).path)
+
+    def get_media_requests(self, item, info):
+        for file_url in item['file_urls']:
+            print( f'file_url => {file_url}' )
+            
+            yield scrapy.Request( url=file_url )
+
+    def item_completed(self, results, item, info):
+        pprint( f'file_item_completed => {results}' )
+        
+        image_paths = [x['path'] for ok, x in results if ok]
+        if not image_paths:
+            raise DropItem("Item contains no images")
+        item['files'] = image_paths
+        
         return item
 
 class MongoPipeline(object):
