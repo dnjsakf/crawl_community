@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-MAINTAINER heo "dnjsakf@gmaild.com"
+MAINTAINER heo "dnjsakf@gmail.com"
 
 RUN sed -i 's/archive.ubuntu.com/kr.archive.ubuntu.com/g' /etc/apt/sources.list
 RUN apt-get update && apt-get install -y \

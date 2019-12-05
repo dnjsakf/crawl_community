@@ -8,8 +8,6 @@ from scrapy.http import HtmlResponse
 from datetime import datetime as dt
 from communities.items import YgosuItem
 
-from pprint import pprint
-
 class YgosuSpider(scrapy.Spider):
     name = 'ygosu'
     allowed_domains = ['www.ygosu.com']
@@ -23,26 +21,28 @@ class YgosuSpider(scrapy.Spider):
         super(YgosuSpider, self).__init__( *args, **kargs )
         ''' request_data is scrapyrt.Resources.CrawlResource.prepare_crawl에서 받아옴 '''
 
-        request_data = kargs['request_data'] if 'request_data' in kargs else kargs
-
-        self.collection = 'ygosu'
-        self.cate = request_data['cate'] if 'cate' in request_data else 'yeobgi'
-        self.page = request_data['page'] if 'page' in request_data else 1
+        self.cate = kargs['cate'] if 'cate' in kargs else 'yeobgi'
+        self.page = kargs['page'] if 'page' in kargs else 1
 
         self.homeUrl = 'https://www.ygosu.com'
         self.loginPath = '/login/common_login.yg'
 
         self.start_urls = [
-            f'{ self.homeUrl }/community/{ self.cate }/?page={ self.page }'
+            '{0}/community/{1}/?page={2}'.format( self.homeUrl, self.cate, self.page )
         ]
 
     def start_requests( self ):
         for url in self.start_urls:
-            print( f'request_url => { url }' )
-            yield scrapy.Request( url, callback=self.parse )
+            self.logger.info( 'request_url => {0}'.format( url ) )
+            meta = {
+                "mode": "html"
+                , "login_path": self.loginPath
+                , "adult": 0
+            }
+            yield scrapy.Request( url=url, meta=meta, callback=self.parse )
 
     def parse( self, response ):
-        print( f'after_response => { response }' )
+        self.logger.info( 'after_response => {0}'.format( response ) )
         contents = response.xpath('//*[@id="contain"]/div[2]/div[1]/div[2]/table/tbody/tr')
 
         for content in contents:
@@ -54,7 +54,7 @@ class YgosuSpider(scrapy.Spider):
             author = content.xpath('td[@class="name"]/a/text()').extract_first()
             read = content.xpath('td[@class="read"]/text()').extract_first()
             link = content.xpath('td[@class="tit"]/a/@href').extract_first()
-            load_dttm = dt.now().strftime('%Y%m%d%H%M%S')
+            adult = response.request.meta['adult']
 
             item = YgosuItem(
                 community = self.name
@@ -64,9 +64,10 @@ class YgosuSpider(scrapy.Spider):
                 , author = author.strip() if author else author
                 , read = read.strip() if read else read
                 , link = self.homeUrl + ( link.strip() if link else link )
-                , load_dttm = load_dttm
+                , adult = adult if adult else 0
+                , login_path = self.loginPath
             )
-            
+
             yield item
 
 

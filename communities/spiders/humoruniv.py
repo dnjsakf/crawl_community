@@ -36,18 +36,18 @@ class HumorunivSpider(scrapy.Spider):
         self.loginPath = '/user/login.html'
 
         self.start_urls = [
-            f'{ self.homeUrl }/board/humor/list.html?table={ self.cate }&pg={ self.page }'
+            '{0}/board/humor/list.html?table={1}&pg={2}'.format( self.homeUrl, self.cate, self.page )
         ]
 
     def start_requests( self ):
         for url in self.start_urls:
-            print( f'request_url => { url }' )
+            self.logger.info( 'request_url => {0}'.format( url ) )
             yield scrapy.Request( url, callback=self.parse )
 
     def parse( self, response ):
         contents = response.xpath('//*[@id="cnts_list_new"]/div[1]/table[2]/tbody/tr')
 
-        print( f'after_response => { len(contents) } / { response } ' )
+        self.logger.info( 'after_response => {0} / {1}'.format( len(contents), response ) )
 
         for content in contents:
 

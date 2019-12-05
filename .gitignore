@@ -6,5 +6,8 @@ eggs
 logs
 files
 build
+drivers
 project.egg*
 __pycache__
+
+make_cookie.py

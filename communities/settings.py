@@ -20,17 +20,24 @@ DOWNLOAD_DELAY = 5
 ROBOTSTXT_OBEY = False
 COOKIES_ENABLED = True
 
-from communities.config import MONGO_URI, MONGO_DATABASE
+FILES_STORE = 'files'
+IMAGES_STORE = 'files'
+DEFAULT_FILES_URLS_FIELD = 'file_urls'
+DEFAULT_FILES_RESULT_FIELD = 'files'
+
+from communities.config import MONGO_URI, MONGO_DATABASE, MONGO_COLLECTION
 
 DOWNLOADER_MIDDLEWARES = {
    'communities.middlewares.SeleniumMiddleware': 200,
 }
+'''
 SPIDER_MIDDLEWARES = {
     'communities.middlewares.SpiderMiddleware': 543,
 }
+'''
 
 DEFAULT_REQUEST_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
     #'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     #'Accept-Language': 'en',
 }
@@ -39,6 +46,7 @@ DEFAULT_REQUEST_HEADERS = {
 ITEM_PIPELINES = {
    'communities.pipelines.MongoPipeline': 100,
    'communities.pipelines.TestPipeline': 200,
+    'communities.pipelines.MediaFilePipeline': 1
 }
 '''
 

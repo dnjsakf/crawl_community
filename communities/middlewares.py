@@ -23,7 +23,7 @@ class SeleniumMiddleware(object):
 
     def process_request( self, request, spider ):
         mode = request.meta['mode'] if 'mode' in request.meta else 'html'
-        
+
         if mode == 'html':
             url, body = next(self.request_html(request, spider))
         elif mode == 'data':
@@ -35,39 +35,56 @@ class SeleniumMiddleware(object):
             
     def request_html(self, request, spider):
         request.meta['driver'] = self.driver
-        
-        self.driver.implicitly_wait( 3 )
+
         self.driver.get( request.url )
 
         parsedUrl = urllib.parse.urlparse( self.driver.current_url )
-        if parsedUrl.path == spider.loginPath:
-            # 쿠키 가져오기
+        if parsedUrl.path == request.meta['login_path']:
+
+            spider.logger.info( '@@@@@@ Need to login => {0}'.format( request.meta["login_path"] ) )
+
+            # 쿠키 가져오기 -> 로그인하기
             with open('./communities/config/cookies.pkl', 'rb') as reader:
                 cookies = pickle.load(reader)
-            print( f'cookies => { cookies }' )
-            print( f'Need to login => { parsedUrl.path }' )
+
             for cookie in cookies:
                 self.driver.add_cookie( cookie )
-                
-            self.driver.implicitly_wait( 3 )
-            self.driver.get( request.url )
 
-        print( f'selenium request => { parsedUrl }' )
+            #self.driver.find_element_by_id('login_form_id').send_keys('vvve12')
+            #self.driver.find_element_by_id('login_form_pwd').send_keys('wjddns1')
+            #self.driver.find_element_by_xpath('//*[@id="login_form"]/div/div[1]/div[2]/a/img').click()
+            
+            self.driver.get( request.url )
+            request.meta['adult'] = 1
+
+        previousY = -1
+        while True:
+            # Scroll down to bottom
+            self.driver.execute_script("window.scrollTo(window.scrollY, window.scrollY+500);")
+
+            # time.sleep(0.5)
+
+            # Calculate new scroll height and compare with last scroll height
+            currentY = self.driver.execute_script("return window.scrollY")
+            if previousY == currentY:
+                break
+            previousY = currentY
+
         body = to_bytes( text=self.driver.page_source )
         
-        yield (self.driver.current_url, body)
+        yield ( self.driver.current_url, body )
         
-    def request_data(self, request, spider):        
+    def request_data(self, request, spider):
         req = urllib.request.Request( request.url )
         body = urllib.request.urlopen( req ).read()
-        
-        yield (request.url, body)
+
+        yield ( request.url, body )
  
     def spider_opened(self, spider):
         PLATFORM = platform.system()
-        
+
         CHROME_PATH = '/usr/bin/google-chrome'
-        DIRVER_NAME = 'chromedriver_78' + '.exe' if PLATFORM == 'Windows' else ''
+        DIRVER_NAME = 'chromedriver_78' + ( '.exe' if PLATFORM == 'Windows' else '' )
         CHROMEDRIVER_PATH = os.path.join( os.path.dirname(os.path.abspath(__file__)), 'drivers', DIRVER_NAME )
         WINDOW_SIZE = "1920,1080"
 
@@ -78,12 +95,13 @@ class SeleniumMiddleware(object):
         chrome_options.add_argument( f"--window-size={ WINDOW_SIZE }" )
 
         driver = webdriver.Chrome( executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options )
+        driver.implicitly_wait( 5 )
 
         self.driver = driver
 
     def spider_closed(self, spider):
         self.driver.close()
-        
+
 
 class SpiderMiddleware(object):
     pass

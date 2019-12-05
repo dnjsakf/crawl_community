@@ -15,6 +15,8 @@ class ContentItem(scrapy.Item):
     author = scrapy.Field()
     link = scrapy.Field()
     read = scrapy.Field()
+    adult = scrapy.Field(default=0)
+    login_path = scrapy.Field(default='null')
     load_dttm = scrapy.Field(serializer=str)
 
 class YgosuItem(ContentItem):
@@ -28,5 +30,6 @@ class ImageItem(scrapy.Item):
     image_urls = scrapy.Field()
     
 class FileItem(scrapy.Item):
+    _id = scrapy.Field()
     files = scrapy.Field()
     file_urls = scrapy.Field()

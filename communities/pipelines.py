@@ -2,96 +2,119 @@
 import os
 import pymongo
 import scrapy
+import logging
 
 from scrapy.exceptions import DropItem
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.pipelines.files import FilesPipeline
+from scrapy.pipelines.media import MediaPipeline
 from scrapy.http import HtmlResponse
 from scrapy.exceptions import DropItem
 
 from urllib.request import Request, urlopen
 from urllib.parse  import urlparse
 
-from pprint import pprint
+from bson.objectid import ObjectId
+from datetime import datetime as dt
 
-class MediaImagePipeline( ImagesPipeline ):
-    
-    def file_path(self, request, response=None, info=None):
-        return 'images/' + os.path.basename(urlparse(request.url).path) +'.mp4'
+logger = logging.getLogger(__name__)
 
-    def get_media_requests(self, item, info):
-        for file_url in item['file_urls']:
-            print( f'image_url => {file_url}' )
-            yield scrapy.Request( url=file_url, meta={'mode': 'data'} )
-
-    def item_completed(self, results, item, info):
-        pprint( f'image_completed => {results}' )
-        
-        image_paths = [x['path'] for ok, x in results if ok]
-        if not image_paths:
-            raise DropItem("Item contains no images")
-        item['files'] = image_paths
-        
-        return item
 
 class MediaFilePipeline( FilesPipeline ):
-    
+
+    mongo_uri = None
+    mongo_db = None
+    mongo_collection = None
+
+    def open_spider(self, spider, *args, **kwargs):
+        self.spiderinfo = self.SpiderInfo(spider)
+
+        self.client = spider.client
+        self.database = spider.database
+
+    def close_spider(self, spider):
+        self.client.close()
+        spider.client.close()
+
     def file_path(self, request, response=None, info=None):
         return 'files/' + os.path.basename(urlparse(request.url).path)
 
     def get_media_requests(self, item, info):
         for file_url in item['file_urls']:
-            print( f'file_url => {file_url}' )
-            
-            yield scrapy.Request( url=file_url )
+            logger.info( 'file_url => {0}'.format( file_url ) )
+            yield scrapy.Request( url=file_url, dont_filter=True, meta={ 'mode': 'data' } )
 
     def item_completed(self, results, item, info):
-        pprint( f'file_item_completed => {results}' )
+        failure_path = [ [res, res.args] for success, res in results if success == False]
+        success_path = [ res['path'] for success, res in results if success == True]
+
+        logger.info( 'file_item_completed => {0} {1}'.format( len(success_path), len(failure_path) ))
+        logger.debug( failure_path )
+
+        #if not success_path:
+        #    raise DropItem("Item contains no images")
+        item['files'] = success_path
         
-        image_paths = [x['path'] for ok, x in results if ok]
-        if not image_paths:
-            raise DropItem("Item contains no images")
-        item['files'] = image_paths
-        
+        self.database.update(
+            {
+                '_id': ObjectId(item['_id'])
+            },
+            {
+                '$set': {
+                    'completed': {
+                        'date': dt.now().strftime('%Y%m%d%H%M%S')
+                        , 'success': len( success_path )
+                        , 'failure': len( failure_path )
+                    },
+                }
+            }
+        )
+
         return item
+
 
 class MongoPipeline(object):
 
     mongo_uri = None
     mongo_db = None
+    mongo_collection = None
 
-    def __init__(self, mongo_uri, mongo_db):
+    def __init__(self, mongo_uri, mongo_db, mongo_collection):
         self.mongo_uri = mongo_uri
         self.mongo_db = mongo_db
+        self.mongo_collection = mongo_collection
 
     @classmethod
     def from_crawler(cls, crawler):
         return cls(
             mongo_uri = crawler.settings.get('MONGO_URI'),
-            mongo_db = crawler.settings.get('MONGO_DATABASE', 'items')
+            mongo_db = crawler.settings.get('MONGO_DATABASE'),
+            mongo_collection = crawler.settings.get('MONGO_COLLECTION')
         )
 
     def open_spider(self, spider, *args, **kwargs):
         self.client = pymongo.MongoClient( self.mongo_uri )
-
-        self.db = self.client[ self.mongo_db ][ spider.collection ]
+        self.database = self.client[ self.mongo_db ][ self.mongo_collection ]
 
     def close_spider(self, spider):
         self.client.close()
 
     def process_item(self, item, spider):
         try:
-            self.db.update(
+            item['load_dttm'] = dt.now().strftime('%Y%m%d%H%M%S')
+
+            self.database.update(
                 { 
-                    'cate': item['cate']
-                    , 'no': item['no'] 
+                    'community': item['community']
+                    , 'cate': item['cate']
+                    , 'no': item['no']
                 }, 
                 { 
-                    '$set': dict(item) 
+                    '$set': dict(item)
                 }, 
                 upsert=True 
             )
         except Exception as err:
-            print( err )
+            logger.error( err )
 
         return item
