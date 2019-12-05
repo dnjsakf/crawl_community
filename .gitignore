@@ -1,4 +1,5 @@
-communities/config/*
+communities/config/cookies.pkl
+communities/config/__init__.py
 .venv
 .vscode
 dbs
