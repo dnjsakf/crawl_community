@@ -1,3 +1,5 @@
+import time
+
 from communities.spiders import MediaSpider, YgosuSpider
 
 from scrapy.utils.project import get_project_settings
@@ -20,14 +22,10 @@ class SpiderRunner(CrawlerRunner):
 
     def run(self, *args, **kwargs):
         self.crawl( self.spider, *args, **kwargs )
-        d = self.join()
-        d.addBoth(lambda _: reactor.stop())
-        reactor.callFromThread(self.notThreadSafe, 3)
+        deferred = self.join()
+        deferred.addBoth(lambda _: reactor.stop())
+        reactor.callFromThread(lambda duration: time.sleep(duration), 5)
         reactor.run()
-
-    def notThreadSafe(self, x):
-        """do something that isn't thread-safe"""
-        # ...
 
 @app.task(ignore_result=True)
 def runCommunitySpider(*args, **kwargs):

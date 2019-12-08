@@ -3,11 +3,13 @@ import dotenv
 from flask import Flask
 from flask_cors import CORS
 
+from app.utils.database import MongoDB
+
 app = Flask(__name__, root_path='', static_folder='/static', template_folder='app/templates')
 
 def createApp(env='dev'):
 
-    from app.routes import route_api
+    from app.routes import index_api, route_api, auth_api
 
     envConfFile = os.path.join(os.path.dirname(__file__), 'config/env', '.env')
     envConf = dotenv.load_dotenv( dotenv_path=envConfFile )
@@ -19,9 +21,9 @@ def createApp(env='dev'):
     celeryConfFile = os.path.join('tasks', f'celeryconfig.py')
     app.config.from_pyfile( celeryConfFile )
 
-    print( app.config )
-
     if 'CORS' in app.config:
         CORS( app=app, resources=app.config['CORS'] )
+
+    app.config['database'] = MongoDB.connect()
 
     return app

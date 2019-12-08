@@ -3,22 +3,22 @@ from app import app
 
 from tasks import crawl
 
-@app.route('/', methods=[ 'GET', 'POST' ])
-def runTask():
+@app.route('/api', methods=[ 'GET', 'POST' ])
+def apiTask():
 
     crawl.test.delay()
 
     return 'test'
 
-@app.route('/ygosu', methods=[ 'GET', 'POST' ])
-def runYgosu():
+@app.route('/api/ygosu', methods=[ 'GET', 'POST' ])
+def apiYgosu():
 
     task = crawl.runCommunitySpider.delay(cate='adultpic', page=1)
 
     return jsonify({"type":"CommunitySpider", "task.id":task.id})
 
-@app.route('/media', methods=[ 'GET', 'POST' ])
-def runMedia():
+@app.route('/api/media', methods=[ 'GET', 'POST' ])
+def apiMedia():
 
     task = crawl.runMeidaSpider.delay()
 

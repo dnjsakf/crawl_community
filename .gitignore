@@ -11,4 +11,6 @@ drivers
 project.egg*
 __pycache__
 
+node_modules
+
 make_cookie.py

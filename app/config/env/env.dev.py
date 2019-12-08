@@ -1,5 +1,5 @@
 BASE_URL = 'http://localhost:4000'
-DEBUG = True
 CORS = {
     r'*': { 'origin': '*' }
 }
+SECRET_KEY = 'AikpYFXdJGtqd3NRVLDTvri2pOxpzi7vcaF4WFC9TBY='
