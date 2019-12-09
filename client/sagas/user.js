@@ -5,7 +5,6 @@ import { DELETE_USER, DELETE_USER_SUCCESS, DELETE_USER_FAILURE } from '../reduce
 import { SELECT_USER, SELECT_USER_SUCCESS, SELECT_USER_FAILURE } from '../reducers/user'
 
 import axios from 'axios'
-import { SELECT_SUCCESS, SELECT_FAILURE } from '../reducers/crud'
 
 function requestSignIn( userinfo ){
   console.log( '[saga][user] requestSignIn', userinfo );
@@ -20,12 +19,18 @@ function requestSignIn( userinfo ){
     , data: {
       userinfo: userinfo
     }
+    , withCredentials: true
+  }).then((response)=>{
+    return response
+  }).catch((error)=>{
+    console.error( error )
+    return error
   });
 }
 
 function requestSignUp( userinfo ){
   console.log( '[saga][user] requestSignUp', userinfo );
-  return axios({
+  axios({
     method: 'POST'
     , baseURL: 'http://localhost:3000'
     , headers: {
@@ -36,6 +41,12 @@ function requestSignUp( userinfo ){
     , data: {
       userinfo: userinfo
     }
+    , withCredentials: true
+  }).then((response)=>{
+     return response
+  }).catch((error)=>{
+    console.log( error )
+    throw error
   });
 }
 
@@ -44,12 +55,12 @@ function* handleSelect( action ){
     const response = yield call( requestSignIn, action.payload );
     console.log('[saga][user] handleSelect', response);
     yield put({
-      type: SELECT_SUCCESS
+      type: SELECT_USER_SUCCESS
       , payload: response.data
     });
   } catch ( error ){
     yield put({
-      type: SELECT_FAILURE
+      type: SELECT_USER_FAILURE
       , payload: error
     })
   } 

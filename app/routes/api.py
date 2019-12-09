@@ -1,23 +1,23 @@
-from flask import jsonify, request
-from app import app
-
+from flask import Blueprint, jsonify, request
 from tasks import crawl
 
-@app.route('/api', methods=[ 'GET', 'POST' ])
+bp_api = Blueprint('api', __name__, url_prefix='/api')
+
+@bp_api.route('/', methods=[ 'GET', 'POST' ])
 def apiTask():
 
     crawl.test.delay()
 
     return 'test'
 
-@app.route('/api/ygosu', methods=[ 'GET', 'POST' ])
+@bp_api.route('/ygosu', methods=[ 'GET', 'POST' ])
 def apiYgosu():
 
     task = crawl.runCommunitySpider.delay(cate='adultpic', page=1)
 
     return jsonify({"type":"CommunitySpider", "task.id":task.id})
 
-@app.route('/api/media', methods=[ 'GET', 'POST' ])
+@bp_api.route('/media', methods=[ 'GET', 'POST' ])
 def apiMedia():
 
     task = crawl.runMeidaSpider.delay()

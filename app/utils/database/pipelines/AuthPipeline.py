@@ -1,6 +1,6 @@
 from app import app
 from app.utils.crypt.AESCipher import AESCipher
-from app.utils.Exceptions.AuthException import AuthException, PasswordNotMatchedException, NotFoundUserException, AlreadyExistUserException
+from app.utils.exceptions.AuthException import AuthException
 
 from bson.objectid import ObjectId
 
@@ -12,62 +12,34 @@ class AuthPipeline(object):
   def __init__(cls, client):
     cls.client = client
 
-
   @classmethod
   def insertUser( cls, userinfo ):
-    secretKey = app.config['SECRET_KEY']
-
     exists = cls.client['test']['users'].find_one({"email": userinfo['email']})
 
     if not exists:
-      userinfo['password'] = AESCipher(secretKey).encrypt_str(userinfo['password'])
+      userinfo['password'] = AESCipher(app.secret_key).encrypt_str(userinfo['password'])
 
       result = cls.client['test']['users'].insert_one( userinfo )
 
       if result:
-        return ( str(result.inserted_id), None )
+        return str(result.inserted_id)
       else:
-        return ( None, AuthException )
-    else:
-      return ( None, AlreadyExistUserException )
+        raise AuthException('존재하지 않는 이메일입니다.', 400)
+    raise AuthException('이미 가입된 이메일입니다.', 400)
 
 
   @classmethod
   def selectUser( cls, userinfo ):
-    secretKey = app.config['SECRET_KEY']
-
     result = cls.client['test']['users'].find_one({'email': userinfo['email']})
 
     if result:
       result['_id'] = str( result['_id'] )
       result = dict( result )
 
-      if AESCipher(secretKey).compare(userinfo['password'], result['password']):
-        return ( result, None )
+      if AESCipher(app.secret_key).compare(userinfo['password'], result['password']):
+        del result['password']
+        return result
       else:
-        return ( None, PasswordNotMatchedException )
-    return ( None, NotFoundUserException )
+        raise AuthException('패스워드가 일치하지 않습니다.', 400)
+    raise AuthException('사용자를 찾을 수 없습니다.', 400)
 
-
-  @classmethod
-  def selectUser2( cls, userinfo ):
-    pipelines = []
-
-    match = { "$match": {
-        "email": userinfo["email"]
-    } }
-    addFields = {
-      "$addFields": {
-        "_id": { "$toString": "$_id" }
-      }
-    }
-    project = {
-      "$project": {
-        "email": 1
-        , "password": 1
-        , "_id": 1
-      }
-    }
-    limit = { "$limit": 1 }
-
-    return list(cls.client['test']['users'].aggregate([ match, addFields, project, limit ]))

@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import { actionSelectUser } from './../../reducers/user'
 
 import Avatar from '@material-ui/core/Avatar';
@@ -49,9 +50,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SignIn() {
+const SignIn = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch();
+
+  const { logged, success } = useSelector(( state )=>( state.user ), [ ])
 
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -62,10 +65,19 @@ export default function SignIn() {
       email: emailRef.current.value
       , password: passwordRef.current.value
     }
-    console.log( userinfo );
-
     dispatch( actionSelectUser( userinfo ) )
   }, []);
+
+  useEffect(()=>{
+    console.log('[SingIn][current]', logged, success );
+    if( logged === 1 && success ){
+      console.log('redirect to /');
+      props.history.push('/');
+    }
+    return ()=>{
+      console.log('[SingIn][prev]', logged, success );
+    }
+  },[ logged, success ])
 
   return (
     <Container component="main" maxWidth="xs">
@@ -135,4 +147,6 @@ export default function SignIn() {
       </Box>
     </Container>
   );
-}
+});
+
+export default withRouter(SignIn)

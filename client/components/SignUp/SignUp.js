@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { actionInsertUser } from './../../reducers/user'
+import { withRouter } from 'react-router-dom'
+import { actionInsertUser, actionInitUser } from './../../reducers/user'
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -49,9 +50,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SignUp() {
+const SignUp = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch()
+
+  const { logged, success } = useSelector((state)=>(state.user),[])
 
   const emailRef = useRef()
   const firstNameRef = useRef()
@@ -66,9 +69,23 @@ export default function SignUp() {
       , 'email': emailRef.current.value
       , 'password': passwordRef.current.value
     }
-    console.log( userinfo );
-    dispatch( actionInsertUser( userinfo ) )
+    dispatch( actionInsertUser( userinfo ) );
   }, [ ]);
+
+
+  useEffect(()=>{
+    console.log('[SingUp][current]', logged, success );
+    if( logged === 1 && success ){
+      console.log('redirect to /auth/signin');
+      
+      dispatch( actionInitUser() );
+
+      props.history.push('/auth/signin');
+    }
+    return ()=>{
+      console.log('[SingUp][prev]', logged, success );
+    }
+  },[ logged, success ])
 
   return (
     <Container component="main" maxWidth="xs">
@@ -163,4 +180,6 @@ export default function SignUp() {
       </Box>
     </Container>
   );
-}
+});
+
+export default withRouter( SignUp )

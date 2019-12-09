@@ -23,7 +23,7 @@ class MongoDB(object):
                 client = MongoClient( MongoConf.URL )
                 try:
                     info = client.server_info()
-                    logger.info( info )
+                    #logger.info( info )
                     break
                 except errors.ServerSelectionTimeoutError as error:
                     logger.info(f' { error } : retry...{ trying }/{ retry }')

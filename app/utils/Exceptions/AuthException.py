@@ -1,16 +1,25 @@
+from app import app
+from flask import jsonify
+from flask_cors import cross_origin
+
 class AuthException(Exception):
-  def __init__(self):
-    super(AuthException, self).__init__('유저 인증 오류')
+  def __init__(self, message, status_code=400, payload=None):
+    super(AuthException, self).__init__()
+    self.message = message
+    self.status_code = status_code
+    self.payload = payload
 
-class PasswordNotMatchedException(Exception):
-  def __init__(self):
-    super(PasswordNotMatchedException, self).__init__('비밀번호가 일치하지 않습니다')
+  def __str__(self):
+    return '[{status_code}] {message}'.format(status_code=self.status_code, message=self.message)
+  
+  def to_dict(self):
+    return {
+      "status_code": self.status_code
+      , "message": self.message
+      , "payload": self.payload
+    }
 
-class NotFoundUserException(Exception):
-  def __init__(self):
-    super(NotFoundUserException, self).__init__('유저를 찾을 수 없습니다.')
-  
-class AlreadyExistUserException(Exception):
-  def __init__(self):
-    super(AlreadyExistUserException, self).__init__('이미 가입된 이메일입니다.')
-  
+@app.errorhandler(AuthException)
+def AuthHandler( error ):
+  app.logger.error( error.to_dict() )
+  return jsonify(error.to_dict()), error.status_code

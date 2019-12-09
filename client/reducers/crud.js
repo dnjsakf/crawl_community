@@ -28,7 +28,6 @@ const initState = {
 }
 
 const crudReducer = ( state=initState, action )=>{
-
   console.log('[reducer] crudReducer', action);
 
   switch( action.type ){
