@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { actionSelectUser } from './../../reducers/user'
+import { actionSignIn } from './../../reducers/auth'
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -54,7 +54,7 @@ const SignIn = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const { logged, success } = useSelector(( state )=>( state.user ), [ ])
+  const { logged, success, userinfo } = useSelector(( state )=>( state.auth ), [ ])
 
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -65,19 +65,21 @@ const SignIn = memo(( props )=>{
       email: emailRef.current.value
       , password: passwordRef.current.value
     }
-    dispatch( actionSelectUser( userinfo ) )
+    dispatch( actionSignIn( userinfo ) )
   }, []);
 
   useEffect(()=>{
     console.log('[SingIn][current]', logged, success );
     if( logged === 1 && success ){
       console.log('redirect to /');
+      localStorage.setItem( "logged", logged );
+      localStorage.setItem( "userinfo", JSON.stringify( userinfo ) );
       props.history.push('/');
     }
     return ()=>{
       console.log('[SingIn][prev]', logged, success );
     }
-  },[ logged, success ])
+  },[ logged, success, userinfo ])
 
   return (
     <Container component="main" maxWidth="xs">
@@ -135,7 +137,7 @@ const SignIn = memo(( props )=>{
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link href="/auth/signup" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

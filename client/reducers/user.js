@@ -16,11 +16,15 @@ export const SELECT_USER = 'user/SELECT_USER';
 export const SELECT_USER_SUCCESS = 'user/SELECT_USER_SUCCESS';
 export const SELECT_USER_FAILURE = 'user/SELECT_USER_FAILURE';
 
+export const CHECK_USER = 'user/CHECK_USER';
+export const CHECK_USER_FAILURE = 'user/CHECK_USER_FAILURE';
+
 export const actionInitUser = ()=>({type: INIT_USER});
 export const actionInsertUser = ( payload )=>({type: INSERT_USER, payload: payload});
 export const actionUpdateUser = ( payload )=>({type: UPDATE_USER, payload: payload});
 export const actionDeleteUser = ( payload )=>({type: DELETE_USER, payload: payload});
 export const actionSelectUser = ( payload )=>({type: SELECT_USER, payload: payload});
+export const actionCheckUser = ( payload )=>({type: CHECK_USER, payload: payload});
 
 const initState = {
   logged: 0
@@ -36,8 +40,6 @@ const initState = {
 }
 
 const userReducer = ( state=initState, action )=>{
-  console.log('[reducer] userReducer', action);
-
   switch( action.type ){
     case INIT_USER:
       return initState
@@ -78,6 +80,17 @@ const userReducer = ( state=initState, action )=>{
         , logged: -1
         , userinfo: initState.userinfo
         , success: action.payload.success
+      }
+    /** Check **/
+    case CHECK_USER:
+      return {
+        ...state
+        , logged: 0
+      }
+    case CHECK_USER_FAILURE:
+      return {
+        ...state
+        , logged: -1
       }
     default:
       return state

@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { memo, useCallback, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import { actionSignOut } from './../../reducers/auth'
+
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -77,30 +81,48 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SearchAppBar() {
+const SearchAppBar = memo(( props )=>{
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const dispatch = useDispatch();
 
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const [ anchorEl, setAnchorEl ] = useState(null);
+  const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
+  const { logged } = useSelector((state)=>(state.auth));
 
-  const handleProfileMenuOpen = event => {
-    setAnchorEl(event.currentTarget);
-  };
+  const isMenuOpen = Boolean( anchorEl );
+  const isMobileMenuOpen = Boolean( mobileMoreAnchorEl );
+  const isSigned = Boolean( localStorage.getItem('logged') );
 
-  const handleMobileMenuClose = () => {
+  const handleProfileMenuOpen = useCallback((event)=>{
+    setAnchorEl( event.currentTarget );
+  },[ anchorEl ]);
+
+  const handleMobileMenuClose = useCallback(()=>{
     setMobileMoreAnchorEl(null);
-  };
+  }, [ mobileMoreAnchorEl ]);
 
-  const handleMenuClose = () => {
+  const handleMenuClose = useCallback(()=>{
     setAnchorEl(null);
     handleMobileMenuClose();
-  };
+  }, [ anchorEl, mobileMoreAnchorEl ]);
 
-  const handleMobileMenuOpen = event => {
+  const handleMobileMenuOpen = useCallback((event)=>{
     setMobileMoreAnchorEl(event.currentTarget);
-  };
+  }, [ mobileMoreAnchorEl ]);
+
+  const handleAuthSign = useCallback((page)=>(event)=>{
+    handleMenuClose();
+    if( page === 'signout' ){
+      localStorage.clear();
+      dispatch( actionSignOut() );
+    } else {
+      props.history.push('/auth/'+page);
+    }
+  }, [ ]);
+
+  useEffect(()=>{
+    console.log('[signout]', logged);
+  }, [ logged ]);
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -113,8 +135,13 @@ export default function SearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+    {
+      isSigned
+      ? [ <MenuItem key='menu-profile' >Profile</MenuItem>
+          , <MenuItem key='menu-sign-out' onClick={handleAuthSign('signout')}>Sign Out</MenuItem> 
+        ]
+      : <MenuItem onClick={handleAuthSign('signin')}>Sign In</MenuItem>
+    }
     </Menu>
   );
 
@@ -227,4 +254,6 @@ export default function SearchAppBar() {
       {renderMenu}
     </div>
   );
-}
+});
+
+export default withRouter( SearchAppBar );

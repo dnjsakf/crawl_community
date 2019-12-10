@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { actionInsertUser, actionInitUser } from './../../reducers/user'
+import { actionSignUp, actionSignInit } from './../../reducers/auth'
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -54,7 +54,7 @@ const SignUp = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch()
 
-  const { logged, success } = useSelector((state)=>(state.user),[])
+  const { logged, success } = useSelector((state)=>(state.auth),[])
 
   const emailRef = useRef()
   const firstNameRef = useRef()
@@ -69,7 +69,7 @@ const SignUp = memo(( props )=>{
       , 'email': emailRef.current.value
       , 'password': passwordRef.current.value
     }
-    dispatch( actionInsertUser( userinfo ) );
+    dispatch( actionSignUp( userinfo ) );
   }, [ ]);
 
 
@@ -78,7 +78,7 @@ const SignUp = memo(( props )=>{
     if( logged === 1 && success ){
       console.log('redirect to /auth/signin');
       
-      dispatch( actionInitUser() );
+      dispatch( actionSignInit() );
 
       props.history.push('/auth/signin');
     }

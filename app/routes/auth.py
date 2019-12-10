@@ -31,6 +31,12 @@ def authSignUp():
   }
   return jsonify(data), 200
 
+@bp_auth.route('/signout', methods=['POST'])
+def authSignOut():
+  resp = make_response({'success': True})
+  resp.set_cookie('access_token', expires=0)
+  return resp, 200
+
 
 @bp_auth.route('/session', methods=['GET', 'POST'])
 @auth.token_requred
@@ -39,4 +45,14 @@ def authSession( user=None ):
     'success': user is not None
     , 'user': user
   }
+  return jsonify(data), 200
+
+@bp_auth.route('/signchk', methods=['GET', 'POST'])
+@auth.token_requred
+def authSignCheck( user=None ):
+  data = {
+    'success': True
+    , 'user': user
+  }
+  print( data )
   return jsonify(data), 200

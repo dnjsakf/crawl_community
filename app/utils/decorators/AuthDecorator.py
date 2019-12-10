@@ -32,13 +32,16 @@ class AuthDecorator(object):
     def wrapper(*args, **kwargs):
       jwt_secret_key = app.config['JWT_SECRET_KEY']
       token = request.cookies.get('access_token')
-      try:
-        decoded_token = jwt.decode(token, jwt_secret_key, algorithm='HS256')
-      except Exception as e :
-        raise AuthException("유효하지않은 Token 입니다.", 400)
-              
-      user = decoded_token['user']
       
+      user = None
+
+      if token:
+        try:
+          decoded_token = jwt.decode(token, jwt_secret_key, algorithm='HS256')
+        except Exception as e :
+          raise AuthException("유효하지않은 Token 입니다.", 400)
+        user = decoded_token['user']
+
       return func(user=user, *args, **kwargs)
     return wrapper
 
