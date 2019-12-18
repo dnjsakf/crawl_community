@@ -7,7 +7,7 @@ import axios from 'axios';
 const Main = ()=>{
 
   const handleClick = useCallback((event)=>{
-    axios.get('http://localhost:3000/auth/session', { withCredentials: true })
+    axios.get('http://localhost:3000/auth/signchk', { withCredentials: true })
       .then((result)=>{console.log('test',result )})
       .catch((error)=>{console.error( 'test',error )});
   },[]);

@@ -4,33 +4,33 @@ import { withRouter } from 'react-router-dom';
 
 import { actionSignCheck } from './../../reducers/auth'
 
-const Checker = memo(( props )=>{
+  const Checker = memo(( props )=>{
   const dispatch = useDispatch();
 
-  const alreadySigned = Boolean(localStorage.getItem("logged"));
-  const { logged } = useSelector((state)=>( state.auth ), []);
+  const alreadySigned = localStorage.getItem('signed');
+  const { signed, userinfo } = useSelector(( state )=>( state.auth ), []);
 
   const handleAuthCheck = useCallback(()=>{
     dispatch( actionSignCheck() );
   }, [ alreadySigned ]);
 
   useEffect(()=>{
-    handleAuthCheck();
-
-    console.log('[Checker][alreadySigned]', alreadySigned, logged);
-    if( alreadySigned ){
-      props.history.push('/');
-    } else {
-      console.log('[Checker][doSingIn]', alreadySigned, logged);
+    if ( alreadySigned == '1' ){
+      console.log('[Checker][alreadySigned]', alreadySigned, signed);
+      handleAuthCheck();
     }
     return ()=>{
-      console.log('[Checker][prev]', alreadySigned, logged);
+      console.log('[Checker][prev]', alreadySigned, signed);
     }
   }, [ alreadySigned ]);
 
   useEffect(()=>{
-    console.log('[Checker][logged]', logged)
-  }, [ logged ]);
+    console.log('[Checker][signed]', signed, userinfo)
+    localStorage.setItem('signed', signed);
+    if( signed === 1 ){
+      localStorage.setItem('userinfo', JSON.stringify( userinfo ));
+    }
+  }, [ signed ]);
 
   return (
     <></>

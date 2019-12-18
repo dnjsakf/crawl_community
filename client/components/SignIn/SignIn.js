@@ -54,7 +54,7 @@ const SignIn = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const { logged, success, userinfo } = useSelector(( state )=>( state.auth ), [ ])
+  const { signed, success, userinfo } = useSelector(( state )=>( state.auth ), [ ])
 
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -69,17 +69,15 @@ const SignIn = memo(( props )=>{
   }, []);
 
   useEffect(()=>{
-    console.log('[SingIn][current]', logged, success );
-    if( logged === 1 && success ){
+    console.log('[SingIn][current]', signed, success );
+    if( signed === 1 && success ){
       console.log('redirect to /');
-      localStorage.setItem( "logged", logged );
-      localStorage.setItem( "userinfo", JSON.stringify( userinfo ) );
       props.history.push('/');
     }
     return ()=>{
-      console.log('[SingIn][prev]', logged, success );
+      console.log('[SingIn][prev]', signed, success );
     }
-  },[ logged, success, userinfo ])
+  },[ signed, success, userinfo ])
 
   return (
     <Container component="main" maxWidth="xs">

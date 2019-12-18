@@ -54,7 +54,7 @@ const SignUp = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch()
 
-  const { logged, success } = useSelector((state)=>(state.auth),[])
+  const { signed, success } = useSelector((state)=>(state.auth),[])
 
   const emailRef = useRef()
   const firstNameRef = useRef()
@@ -74,8 +74,8 @@ const SignUp = memo(( props )=>{
 
 
   useEffect(()=>{
-    console.log('[SingUp][current]', logged, success );
-    if( logged === 1 && success ){
+    console.log('[SingUp][current]', signed, success );
+    if( signed === 1 && success ){
       console.log('redirect to /auth/signin');
       
       dispatch( actionSignInit() );
@@ -83,9 +83,9 @@ const SignUp = memo(( props )=>{
       props.history.push('/auth/signin');
     }
     return ()=>{
-      console.log('[SingUp][prev]', logged, success );
+      console.log('[SingUp][prev]', signed, success );
     }
-  },[ logged, success ])
+  },[ signed, success ])
 
   return (
     <Container component="main" maxWidth="xs">

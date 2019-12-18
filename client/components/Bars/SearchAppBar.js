@@ -87,11 +87,11 @@ const SearchAppBar = memo(( props )=>{
 
   const [ anchorEl, setAnchorEl ] = useState(null);
   const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
-  const { logged } = useSelector((state)=>(state.auth));
+  const { signed } = useSelector((state)=>(state.auth));
 
   const isMenuOpen = Boolean( anchorEl );
   const isMobileMenuOpen = Boolean( mobileMoreAnchorEl );
-  const isSigned = Boolean( localStorage.getItem('logged') );
+  const isSigned = Boolean( signed );
 
   const handleProfileMenuOpen = useCallback((event)=>{
     setAnchorEl( event.currentTarget );
@@ -121,8 +121,8 @@ const SearchAppBar = memo(( props )=>{
   }, [ ]);
 
   useEffect(()=>{
-    console.log('[signout]', logged);
-  }, [ logged ]);
+    console.log('[SearchAppBar][signed]', signed);
+  }, [ signed ]);
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (

@@ -28,7 +28,7 @@ def createApp(env='dev'):
 
     with app.app_context():
         app.config['database'] = MongoDB.connect()
-    
+
     #session = Session()
     #session.init_app( app )
 

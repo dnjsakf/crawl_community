@@ -16,15 +16,21 @@ export const SIGN_CHECK = 'auth/SIGN_CHECK';
 export const SIGN_CHECK_SUCCESS = 'auth/SIGN_CHECK_SUCCESS';
 export const SIGN_CHECK_FAILURE = 'auth/SIGN_CHECK_FAILURE';
 
+export const REFRESH_TOKEN = 'auth/REFRESH_TOKEN';
+export const REFRESH_TOKEN_SUCCESS ='auth/REFRESH_TOKEN_SUCCESS';
+export const REFRESH_TOKEN_FAILURE = 'auth/REFRESH_TOKEN_FAILURE';
+
 export const actionSignInit = ( payload )=>({ type: SIGN_INIT, payload: payload });
 export const actionSignIn = ( payload )=>({ type: SIGN_IN, payload: payload });
 export const actionSignUp = ( payload )=>({ type: SIGN_UP, payload: payload });
 export const actionSignOut = ( payload )=>({ type: SIGN_OUT, payload: payload });
 export const actionSignCheck = ( payload )=>({ type: SIGN_CHECK, payload: payload });
+export const actionRefreshToken = ( payload )=>({ type: REFRESH_TOKEN, payload: payload });
 
 const initState = {
-  logged: 0
+  signed: 0
   , success: false
+  , token: null
   , userinfo: {
     _id: null
     , email: null
@@ -43,19 +49,19 @@ const authReducer = ( state=initState, action )=>{
     case SIGN_IN:
       return {
         ...state
-        , logged: 0
       }
     case SIGN_IN_SUCCESS:
+      localStorage.setItem('token', action.payload.token)
       return {
         ...state
-        , logged: 1
+        , signed: 1
         , userinfo: action.payload.user
         , success: action.payload.success
       }
     case SIGN_IN_FAILURE:
       return {
         ...state
-        , logged: -1
+        , signed: -1
         , userinfo: initState.userinfo
         , success: action.payload.success
       }
@@ -63,53 +69,68 @@ const authReducer = ( state=initState, action )=>{
     case SIGN_UP:
       return {
         ...state
-        , logged: 0
       }
     case SIGN_UP_SUCCESS:
       return {
         ...state
-        , logged: 1
+        , signed: 1
         , success: action.payload.success
       }
     case SIGN_UP_FAILURE:
       return {
         ...state
-        , logged: 0
+        , signed: 0
         , success: action.payload.success
       }
     /** SignOut */
     case SIGN_OUT:
       return {
         ...state
-        , logged: 0
       }
     case SIGN_OUT_SUCCESS:
       return {
         ...state
-        , logged: 0
+        , signed: 0
         , success: action.payload.success
       }
     case SIGN_OUT_FAILURE:
       return {
         ...state
-        , logged: 0
+        , signed: 0
         , success: action.payload.success
       }
     /** Check **/
     case SIGN_CHECK:
       return {
         ...state
-        , logged: 0
       }
     case SIGN_CHECK_SUCCESS:
       return {
         ...state
-        , logged: 1
+        , signed: 1
+        , userinfo: action.payload.user
+        , success: action.payload.success
       }
     case SIGN_CHECK_FAILURE:
       return {
         ...state
-        , logged: 0
+        , signed: 0
+        , userinfo: initState.userinfo
+        , success: action.payload.success
+      }
+    /** Refresh **/
+    case REFRESH_TOKEN:
+      return {
+        ...state
+      }
+    case REFRESH_TOKEN_SUCCESS:
+      localStorage.setItem('token', action.payload.token)
+      return {
+        ...state
+      }
+    case REFRESH_TOKEN_FAILURE:
+      return {
+        ...state
       }
     default:
       return state

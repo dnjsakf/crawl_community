@@ -21,5 +21,5 @@ class AuthException(Exception):
 
 @app.errorhandler(AuthException)
 def AuthHandler( error ):
-  app.logger.error( error.to_dict() )
+  app.logger.error( error )
   return jsonify(error.to_dict()), error.status_code
