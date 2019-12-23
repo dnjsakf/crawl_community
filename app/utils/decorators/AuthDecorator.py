@@ -8,7 +8,7 @@ from app import app
 from flask import jsonify, request, make_response
 from functools import wraps
 from datetime import datetime, timedelta
-from app.utils.exceptions.AuthException import AuthException
+from app.exceptions import AuthException
 
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
@@ -30,23 +30,21 @@ class AuthDecorator(object):
           now = datetime.now()
           expire = datetime.fromtimestamp(decoded_payload['exp'])
 
-          print( (now - expire).seconds )
-
           if ( now >= expire ):
             pass
-            raise AuthException("Token이 곧 만료됩니다.", 400, {'refresh': True})
+            raise AuthException("Token이 곧 만료됩니다.", 401, {'refresh': True})
           else:
             data = decoded_payload['data']
         except ExpiredSignatureError as e:
-          raise AuthException("만료된 Token 입니다.", 400, {'error': str(e)})
+          raise AuthException("만료된 Token 입니다.", 401, {'error': str(e)})
         except InvalidTokenError as e :
-          raise AuthException("유효하지않은 Token 입니다.", 400, {'error': str(e)})
+          raise AuthException("유효하지않은 Token 입니다.", 401, {'error': str(e)})
         except AuthException as e:
           raise e
         except Exception as e:
-          raise AuthException("인증 오류가 발생하였습니다.", 400, {'error': str(e)})
+          raise AuthException("인증 오류가 발생하였습니다.", 401, {'error': str(e)})
       else:
-        raise AuthException("Token이 존재하지 않습니다.", 400)
+        raise AuthException("Token이 존재하지 않습니다.", 401)
       return func(data=data, *args, **kwargs)
     return wrapper
 
@@ -70,8 +68,11 @@ class AuthDecorator(object):
           client = connect_redis()
           client.set(refresh_id, refresh_token)
 
-        except redis.TimeoutError as e:
-          app.logger.info(f'[Redis][TimeoutError] {e}')
+        except (redis.ConnectionError, redis.TimeoutError, redis.BusyLoadingError) as e:
+          app.logger.info(f'[Redis][Error] {e}')
+        except Exception as e:
+          app.logger.error( e )
+          raise e
 
         data['token'] = refresh_id
 
@@ -83,6 +84,7 @@ class AuthDecorator(object):
         return response, status_code
       else:
         return response, status_code
+
     return wrapper
 
 
@@ -108,7 +110,7 @@ class AuthDecorator(object):
         response.set_cookie('access_token', value=access_token, httponly=True, expires=cookie_expire)
 
       except Exception as e:
-        app.logger.info( e )
+        app.logger.error( e )
         raise e
 
       return response, status_code
@@ -147,4 +149,12 @@ def connect_redis():
   redis_port = app.config['REDIS_PORT']
   redis_db = app.config['REDIS_DB']
   redis_timeout = app.config['REDIS_TIMEOUT']
-  return redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db, socket_timeout=redis_timeout)
+
+  client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db, socket_timeout=redis_timeout)
+
+  try:
+    client.ping()
+  except Exception as e:
+    raise e
+
+  return client

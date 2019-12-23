@@ -4,7 +4,7 @@ from flask import Flask
 from flask_cors import CORS
 #from flask_session import Session
 
-from app.utils.database import MongoDB
+from app.database import MongoDB
 
 app = Flask(__name__, root_path='', static_folder='/static', template_folder='app/templates')
 

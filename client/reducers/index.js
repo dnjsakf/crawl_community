@@ -1,12 +1,14 @@
-import { combineReducers } from 'redux'
-import crudReducer from './crud'
-import userReducer from './user'
-import authReducer from './auth'
+import { combineReducers } from 'redux';
+import crudReducer from './crud';
+import { signReducer } from './auth';
+import { tabsReducer } from './event';
+import { communitiesReducer } from './cnts';
 
 const rootReducer = combineReducers({
   crud: crudReducer
-  , user: userReducer
-  , auth: authReducer
-})
+  , sign: signReducer
+  , communities: communitiesReducer
+  , tabs: tabsReducer
+});
 
-export default rootReducer
+export default rootReducer;

@@ -1,11 +1,10 @@
 import json
-import jwt
 
 from app import app
 from flask import Blueprint, jsonify, request, make_response, Response
 
-from app.utils.database.pipelines.AuthPipeline import AuthPipeline
-from app.utils.decorators.AuthDecorator import AuthDecorator as auth
+from app.database.pipelines import AuthPipeline
+from app.utils.decorators import AuthDecorator as auth
 
 bp_auth = Blueprint('auth', __name__, url_prefix='/auth')
 

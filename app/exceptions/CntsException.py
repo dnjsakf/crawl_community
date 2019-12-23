@@ -1,10 +1,9 @@
 from app import app
 from flask import jsonify
-from flask_cors import cross_origin
 
-class AuthException(Exception):
+class CntsException(Exception):
   def __init__(self, message, status_code=400, payload=None):
-    super(AuthException, self).__init__()
+    super(CntsException, self).__init__()
     self.message = message
     self.status_code = status_code
     self.payload = payload
@@ -19,7 +18,7 @@ class AuthException(Exception):
       , "payload": self.payload
     }
 
-@app.errorhandler(AuthException)
+@app.errorhandler(CntsException)
 def AuthHandler( error ):
   app.logger.error( error )
   return jsonify(error.to_dict()), error.status_code

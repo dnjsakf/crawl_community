@@ -41,7 +41,7 @@ const initState = {
   }
 }
 
-const authReducer = ( state=initState, action )=>{
+const signReducer = ( state=initState, action )=>{
   switch( action.type ){
     case SIGN_INIT:
       return initState
@@ -51,12 +51,12 @@ const authReducer = ( state=initState, action )=>{
         ...state
       }
     case SIGN_IN_SUCCESS:
-      localStorage.setItem('token', action.payload.token)
       return {
         ...state
         , signed: 1
         , userinfo: action.payload.user
         , success: action.payload.success
+        , token: action.payload.token
       }
     case SIGN_IN_FAILURE:
       return {
@@ -124,9 +124,9 @@ const authReducer = ( state=initState, action )=>{
         ...state
       }
     case REFRESH_TOKEN_SUCCESS:
-      localStorage.setItem('token', action.payload.token)
       return {
         ...state
+        , token: action.payload.token
       }
     case REFRESH_TOKEN_FAILURE:
       return {
@@ -136,4 +136,4 @@ const authReducer = ( state=initState, action )=>{
       return state
   }
 }
-export default authReducer
+export default signReducer;

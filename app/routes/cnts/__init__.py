@@ -1,0 +1,1 @@
+from app.routes.cnts.communities import bp_communities

@@ -73,4 +73,3 @@ class MongoDB(object):
     def destroy( cls ):
         cls.CLIENT = None
         cls.SESSION = None
-

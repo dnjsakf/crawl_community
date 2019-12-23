@@ -2,7 +2,7 @@ import { all, call, put, fork, takeLatest } from 'redux-saga/effects'
 import { SELECT, SELECT_SUCCESS, SELECT_FAILURE } from '../reducers/crud'
 import { INSERT, INSERT_SUCCESS, INSERT_FAILURE } from '../reducers/crud'
 
-import axios from 'axios'
+import axios from './../utils/axios'
 
 function requestWithAxios( options ){
   console.log( '[saga] request', options );

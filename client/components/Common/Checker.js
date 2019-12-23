@@ -1,23 +1,26 @@
-import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
+import React, { memo, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { actionSignCheck } from './../../reducers/auth'
+import { actionSignCheck } from './../../reducers/auth/sign';
 
-  const Checker = memo(( props )=>{
+const Checker = memo(( props )=>{
   const dispatch = useDispatch();
 
   const alreadySigned = localStorage.getItem('signed');
-  const { signed, userinfo } = useSelector(( state )=>( state.auth ), []);
+  const { signed, userinfo } = useSelector(( state )=>( state.sign ), []);
 
   const handleAuthCheck = useCallback(()=>{
     dispatch( actionSignCheck() );
-  }, [ alreadySigned ]);
+  }, [ signed ]);
+
+  useEffect(()=>{
+    handleAuthCheck();
+  }, []);
 
   useEffect(()=>{
     if ( alreadySigned == '1' ){
       console.log('[Checker][alreadySigned]', alreadySigned, signed);
-      handleAuthCheck();
     }
     return ()=>{
       console.log('[Checker][prev]', alreadySigned, signed);

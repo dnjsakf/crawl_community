@@ -1,5 +1,5 @@
-from app.utils.crypt.AESCipher import AESCipher
-from app.utils.exceptions.AuthException import AuthException
+from app.utils.crypt import AESCipher
+from app.exceptions import AuthException
 
 from bson.objectid import ObjectId
 

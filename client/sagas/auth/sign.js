@@ -1,11 +1,11 @@
-import { all, call, put, fork, takeLatest, takeEvery } from 'redux-saga/effects'
-import { SIGN_IN, SIGN_IN_SUCCESS, SIGN_IN_FAILURE } from '../reducers/auth'
-import { SIGN_UP, SIGN_UP_SUCCESS, SIGN_UP_FAILURE } from '../reducers/auth'
-import { SIGN_OUT, SIGN_OUT_SUCCESS, SIGN_OUT_FAILURE } from '../reducers/auth'
-import { SIGN_CHECK, SIGN_CHECK_SUCCESS, SIGN_CHECK_FAILURE } from '../reducers/auth'
-import { REFRESH_TOKEN, REFRESH_TOKEN_SUCCESS, REFRESH_TOKEN_FAILURE } from '../reducers/auth'
+import { all, call, put, fork, takeLatest } from 'redux-saga/effects';
+import { SIGN_IN, SIGN_IN_SUCCESS, SIGN_IN_FAILURE } from './../../reducers/auth/sign';
+import { SIGN_UP, SIGN_UP_SUCCESS, SIGN_UP_FAILURE } from './../../reducers/auth/sign';
+import { SIGN_OUT, SIGN_OUT_SUCCESS, SIGN_OUT_FAILURE } from './../../reducers/auth/sign';
+import { SIGN_CHECK, SIGN_CHECK_SUCCESS, SIGN_CHECK_FAILURE } from './../../reducers/auth/sign';
+import { REFRESH_TOKEN, REFRESH_TOKEN_FAILURE } from './../../reducers/auth/sign';
 
-import axios from './../utils/axios'
+import axios from './../../utils/axios';
 
 const requestSignIn = ( payload )=> {
   console.log( '[saga][user] requestSignIn', payload );
@@ -165,7 +165,7 @@ function* watchRefreshToken(){
   yield takeLatest( REFRESH_TOKEN, handleRefreshToken );
 }
 
-export default function* authSaga(){
+export default function* signSaga(){
   yield all([
     fork( watchSignIn )
     , fork( watchSignUp )

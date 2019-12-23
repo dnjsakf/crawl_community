@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   name: 'flask',
@@ -63,6 +64,9 @@ module.exports = {
   },
   plugins:[
     new MiniCssExtractPlugin({ filename: 'app.css' })
+    , new HtmlWebpackPlugin({
+      template: 'client/static/index.html'
+    })
   ],
   resolve: {
     alias: {

@@ -1,19 +1,19 @@
 // Config React-init
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
-import App from './components/App'
+import App from './components/App';
 
-import './static/common.css'
+import './static/common.css';
 
 // Config Redux
-import { createStore, applyMiddleware } from 'redux'
-import { Provider } from 'react-redux'
-import rootReducer from './reducers'
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import rootReducer from './reducers';
 
 // Config ReduxSaga
-import createSagaMiddleware from 'redux-saga'
-import rootSagas from './sagas'
+import createSagaMiddleware from 'redux-saga';
+import rootSagas from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
 const devTools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__();
@@ -21,7 +21,7 @@ const store = createStore( rootReducer, applyMiddleware(sagaMiddleware) );
 			  
 function render( Component ){
 	ReactDOM.render( 
-        <AppContainer>
+    <AppContainer>
 			<Provider store={ store }>
 				<Component />
 			</Provider>

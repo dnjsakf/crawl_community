@@ -1,12 +1,12 @@
-import { all, call } from 'redux-saga/effects'
-import crud from './crud'
-import user from './user'
-import auth from './auth'
+import { all, call } from 'redux-saga/effects';
+import crud from './crud';
+import { sign } from './auth';
+import { communities } from './cnts';
 
 export default function* rootSaga(){
   yield all([
     call( crud )
-    , call( user )
-    , call( auth )
+    , call( sign )
+    , call( communities )
   ])
 }

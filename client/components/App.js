@@ -1,20 +1,19 @@
 import React, { memo } from 'react';
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom/';
+import { BrowserRouter, Route, Switch } from 'react-router-dom/';
 
-import Main from './Main/Main';
-import Checker from './Main/Checker';
+import Checker from './Common/Checker';
 import SignIn from './SignIn/SignIn';
 import SignUp from './SignUp/SignUp';
-import SearchAppBar from './Bars/SearchAppBar';
+import Paperbase from './Theme/Paperbase';
 
-const App = memo(()=>{
+const App = memo(( props )=>{
   return (
     <BrowserRouter>
-      <SearchAppBar />
+      {/* <SearchAppBar /> */}
       <Switch>
-        <Route path="/auth/signin" component={()=>(<SignIn />)}/>
-        <Route path="/auth/signup" component={()=>(<SignUp />)}/>
-        <Route path="/" component={()=>(<Main />)}/>
+        <Route exact path="/" component={()=>(<Paperbase />)}/>
+        <Route exact path="/auth/signin" component={()=>(<SignIn />)}/>
+        <Route exact path="/auth/signup" component={()=>(<SignUp />)}/>
       </Switch>
       <Checker/>
     </BrowserRouter>
