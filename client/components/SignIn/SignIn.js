@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { createSelector } from 'reselect';
 import { withRouter, Link } from 'react-router-dom';
 import { actionSignIn } from './../../reducers/auth/sign';
 
@@ -19,19 +20,7 @@ import Container from '@material-ui/core/Container';
 
 /* Icons */
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link to="/" color="inherit">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { Copyright } from './../Contents';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -53,14 +42,24 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const signSelector = createSelector(
+  ( state )=>( state.sign ),
+  ( res )=>({
+    signed: res.signed
+    , success: res.success
+    , userinfo: res.userinfo
+    , token: res.token
+  })
+);
+
 const SignIn = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const { signed, success, userinfo, token } = useSelector(( state )=>( state.sign ), []);
-
   const emailRef = useRef();
   const passwordRef = useRef();
+
+  const { signed, success, userinfo, token } = useSelector( signSelector );
   
   const handleAuthIn = useCallback(( event )=>{ 
     event.preventDefault()
@@ -68,8 +67,8 @@ const SignIn = memo(( props )=>{
       email: emailRef.current.value
       , password: passwordRef.current.value
     }
-    dispatch( actionSignIn( userinfo ) )
-  }, []);
+    dispatch( actionSignIn( userinfo ) );
+  }, [ dispatch ]);
 
   useEffect(()=>{
     console.log('[SingIn][current]', signed, success );

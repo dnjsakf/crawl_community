@@ -1,3 +1,5 @@
+import { createAction, handleActions } from 'redux-actions';
+
 export const SIGN_INIT = 'auth/SIGN_INIT';
 
 export const SIGN_UP = 'auth/SIGN_UP';
@@ -20,12 +22,12 @@ export const REFRESH_TOKEN = 'auth/REFRESH_TOKEN';
 export const REFRESH_TOKEN_SUCCESS ='auth/REFRESH_TOKEN_SUCCESS';
 export const REFRESH_TOKEN_FAILURE = 'auth/REFRESH_TOKEN_FAILURE';
 
-export const actionSignInit = ( payload )=>({ type: SIGN_INIT, payload: payload });
-export const actionSignIn = ( payload )=>({ type: SIGN_IN, payload: payload });
-export const actionSignUp = ( payload )=>({ type: SIGN_UP, payload: payload });
-export const actionSignOut = ( payload )=>({ type: SIGN_OUT, payload: payload });
-export const actionSignCheck = ( payload )=>({ type: SIGN_CHECK, payload: payload });
-export const actionRefreshToken = ( payload )=>({ type: REFRESH_TOKEN, payload: payload });
+export const actionSignInit = createAction( SIGN_INIT );
+export const actionSignIn = createAction( SIGN_IN );
+export const actionSignUp = createAction( SIGN_UP );
+export const actionSignOut = createAction( SIGN_OUT );
+export const actionSignCheck = createAction( SIGN_CHECK );
+export const actionRefreshToken = createAction( REFRESH_TOKEN );
 
 const initState = {
   signed: 0
@@ -41,99 +43,80 @@ const initState = {
   }
 }
 
-const signReducer = ( state=initState, action )=>{
-  switch( action.type ){
-    case SIGN_INIT:
-      return initState
-    /** SingIn **/
-    case SIGN_IN:
-      return {
-        ...state
-      }
-    case SIGN_IN_SUCCESS:
-      return {
-        ...state
-        , signed: 1
-        , userinfo: action.payload.user
-        , success: action.payload.success
-        , token: action.payload.token
-      }
-    case SIGN_IN_FAILURE:
-      return {
-        ...state
-        , signed: -1
-        , userinfo: initState.userinfo
-        , success: action.payload.success
-      }
-    /** SignUp */
-    case SIGN_UP:
-      return {
-        ...state
-      }
-    case SIGN_UP_SUCCESS:
-      return {
-        ...state
-        , signed: 1
-        , success: action.payload.success
-      }
-    case SIGN_UP_FAILURE:
-      return {
-        ...state
-        , signed: 0
-        , success: action.payload.success
-      }
-    /** SignOut */
-    case SIGN_OUT:
-      return {
-        ...state
-      }
-    case SIGN_OUT_SUCCESS:
-      return {
-        ...state
-        , signed: 0
-        , success: action.payload.success
-      }
-    case SIGN_OUT_FAILURE:
-      return {
-        ...state
-        , signed: 0
-        , success: action.payload.success
-      }
-    /** Check **/
-    case SIGN_CHECK:
-      return {
-        ...state
-      }
-    case SIGN_CHECK_SUCCESS:
-      return {
-        ...state
-        , signed: 1
-        , userinfo: action.payload.user
-        , success: action.payload.success
-      }
-    case SIGN_CHECK_FAILURE:
-      return {
-        ...state
-        , signed: 0
-        , userinfo: initState.userinfo
-        , success: action.payload.success
-      }
-    /** Refresh **/
-    case REFRESH_TOKEN:
-      return {
-        ...state
-      }
-    case REFRESH_TOKEN_SUCCESS:
-      return {
-        ...state
-        , token: action.payload.token
-      }
-    case REFRESH_TOKEN_FAILURE:
-      return {
-        ...state
-      }
-    default:
-      return state
-  }
-}
+const signReducer = handleActions({
+  /** SIGN_INIT **/
+  [SIGN_INIT]: ()=>( initState ),
+
+  /** SIGN_IN **/
+  [SIGN_IN]: ( state )=>({
+    ...state
+  }),
+  [SIGN_IN_SUCCESS]: ( state, action )=>({
+    ...state
+    , signed: 1
+    , userinfo: action.payload.user
+    , success: action.payload.success
+    , token: action.payload.token
+  }),
+  [SIGN_IN_FAILURE]: ( state )=>({
+    ...state
+    , signed: -1
+  }),
+
+  /** SIGN_UP **/
+  [SIGN_UP]: ( state )=>({
+    ...state
+  }),
+  [SIGN_UP_SUCCESS]: ( state, action )=>({
+    ...state
+    , signed: 1
+    , success: action.payload.success
+  }),
+  [SIGN_UP_FAILURE]: ( state )=>({
+    ...state
+    , signed: 0
+  }),
+
+  /** SIGN_OUT **/
+  [SIGN_OUT]: ( state )=>({
+    ...state
+  }),
+  [SIGN_OUT_SUCCESS]: ( state, action )=>({
+    ...state
+    , signed: 0
+    , success: action.payload.success
+  }),
+  [SIGN_OUT_FAILURE]: ( state )=>({
+    ...state
+    , signed: 0
+  }),
+
+  /** SIGN_CHECK **/
+  [SIGN_CHECK]: ( state )=>({
+    ...state
+  }),
+  [SIGN_CHECK_SUCCESS]: ( state, action )=>({
+    ...state
+    , signed: 1
+    , userinfo: action.payload.user
+    , success: action.payload.success
+  }),
+  [SIGN_CHECK_FAILURE]: ( state )=>({
+    ...state
+    , signed: 0
+  }),
+
+  /** REFRESH_TOKEN **/
+  [REFRESH_TOKEN]: ( state )=>({
+    ...state
+  }),
+  [REFRESH_TOKEN_SUCCESS]: ( state, action )=>({
+    ...state
+    , token: action.payload.token
+  }),
+  [REFRESH_TOKEN_FAILURE]: ( state )=>({
+    ...state
+  })
+}, initState );
+
 export default signReducer;

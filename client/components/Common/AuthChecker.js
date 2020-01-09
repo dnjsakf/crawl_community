@@ -1,34 +1,42 @@
 import React, { memo, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { createSelector } from 'reselect';
 import { withRouter } from 'react-router-dom';
 
 import { actionSignCheck } from './../../reducers/auth/sign';
 
-const Checker = memo(( props )=>{
+
+const signSelector = createSelector(
+  ( state )=>( state.sign ),
+  ( res )=>( res )
+);
+
+const AuthChecker = memo(( props )=>{
+  const alreadySigned = localStorage.getItem('signed');
+  const { history } = props;
   const dispatch = useDispatch();
 
-  const alreadySigned = localStorage.getItem('signed');
-  const { signed, userinfo } = useSelector(( state )=>( state.sign ), []);
+  const { signed, userinfo } = useSelector( signSelector );
 
   const handleAuthCheck = useCallback(()=>{
     dispatch( actionSignCheck() );
-  }, [ signed ]);
+  }, [ dispatch ]);
 
   useEffect(()=>{
     handleAuthCheck();
-  }, []);
+  }, [ history.location.pathname ]);
 
   useEffect(()=>{
     if ( alreadySigned == '1' ){
-      console.log('[Checker][alreadySigned]', alreadySigned, signed);
+      console.log('[AuthChecker][alreadySigned]', alreadySigned, signed);
     }
     return ()=>{
-      console.log('[Checker][prev]', alreadySigned, signed);
+      console.log('[AuthChecker][prev]', alreadySigned, signed);
     }
   }, [ alreadySigned ]);
 
   useEffect(()=>{
-    console.log('[Checker][signed]', signed, userinfo)
+    console.log('[AuthChecker][signed]', signed, userinfo)
     localStorage.setItem('signed', signed);
     if( signed === 1 ){
       localStorage.setItem('userinfo', JSON.stringify( userinfo ));
@@ -40,4 +48,4 @@ const Checker = memo(( props )=>{
   );
 });
 
-export default withRouter(Checker);
+export default withRouter(AuthChecker);

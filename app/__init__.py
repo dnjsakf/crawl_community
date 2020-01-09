@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 from app.database import MongoDB
 
-app = Flask(__name__, root_path='', static_folder='/static', template_folder='app/templates')
+app = Flask(__name__, root_path='', static_url_path='/static', static_folder='app/static', template_folder='app/templates')
 
 def createApp(env='dev'):
     from app.routes import app

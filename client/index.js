@@ -18,6 +18,16 @@ import rootSagas from './sagas';
 const sagaMiddleware = createSagaMiddleware();
 const devTools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__();
 const store = createStore( rootReducer, applyMiddleware(sagaMiddleware) );
+
+/*
+store.subscribe(()=>{
+	const state = store.getState()
+	console.log( state.communities );
+	console.log( state.sign );
+	console.log( state.menus );
+	console.log( state.tabs );
+});
+*/
 			  
 function render( Component ){
 	ReactDOM.render( 

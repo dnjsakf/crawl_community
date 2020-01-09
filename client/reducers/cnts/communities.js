@@ -1,31 +1,27 @@
+import { createAction, handleActions } from 'redux-actions';
+
 export const GET_COMMUNITIES = 'cnts/communities/GET_COMMUNITIES'
 export const GET_COMMUNITIES_SUCCESS = 'cnts/communities/GET_COMMUNITIES_SUCCESS'
 export const GET_COMMUNITIES_FAILURE = 'cnts/communities/GET_COMMUNITIES_FAILURE'
 
-export const actionGetCommunities = ( payload )=>({ type: GET_COMMUNITIES, payload: payload });
+export const actionGetCommunities = createAction( GET_COMMUNITIES );
 
 const initState = {
   success: false
-  , communities: []
+  , data: []
 }
 
-const communitiesReducer = (state=initState, action)=>{
-  switch(action.type){
-    case GET_COMMUNITIES:
-      return {
-        ...state
-      }
-    case GET_COMMUNITIES_SUCCESS:
-      return {
-        ...state
-        , success: action.payload.success
-        , communities: action.payload.data
-      }
-    case GET_COMMUNITIES_FAILURE:
-      return initState
-    default:
-      return state;
-  }
-}
+const communitiesReducer = handleActions({
+  /** GET_COMMUNITIES **/
+  [GET_COMMUNITIES]: ( state )=>({
+    ...state
+  }),
+  [GET_COMMUNITIES_SUCCESS]: ( state, action )=>({
+    ...state
+    , success: action.payload.success
+    , data: action.payload.data
+  }),
+  [GET_COMMUNITIES_FAILURE]: ()=>( initState ),
+}, initState );
 
 export default communitiesReducer;

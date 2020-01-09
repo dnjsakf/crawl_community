@@ -1,1 +1,1 @@
-import app.config.database as MongoConf
+from app.config.database import MONGO_URL

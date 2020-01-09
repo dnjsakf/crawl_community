@@ -19,6 +19,6 @@ class CntsException(Exception):
     }
 
 @app.errorhandler(CntsException)
-def AuthHandler( error ):
+def CntsHandler( error ):
   app.logger.error( error )
   return jsonify(error.to_dict()), error.status_code

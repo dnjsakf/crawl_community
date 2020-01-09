@@ -21,17 +21,17 @@ function* handleGetCommunities({ payload }){
   } catch ( error ) {
     yield put({
       type: GET_COMMUNITIES_FAILURE
-      , payload: error.response.data
+      , payload: error.response
     });
   }
 }
 
-function* watchRefreshToken(){
+function* watchGetCommunities(){
   yield takeLatest( GET_COMMUNITIES, handleGetCommunities );
 }
 
 export default function* communitiesSaga(){
   yield all([
-    fork( watchRefreshToken )
+    fork( watchGetCommunities )
   ])
 }

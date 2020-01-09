@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { createSelector } from 'reselect';
 import { withRouter, Link } from 'react-router-dom';
 import { actionSignUp, actionSignInit } from './../../reducers/auth/sign';
 
@@ -54,16 +55,21 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const signSelector = createSelector(
+  ( state )=>( state.sign ),
+  ( res )=>( res )
+);
+
 const SignUp = memo(( props )=>{
   const classes = useStyles();
   const dispatch = useDispatch();
-
-  const { success, signed } = useSelector((state)=>( state.sign ), []);
 
   const emailRef = useRef();
   const firstNameRef = useRef();
   const lastNameRef = useRef();
   const passwordRef = useRef();
+
+  const { success, signed } = useSelector( signSelector );
 
   const handleSignUp = useCallback(( event )=>{
     event.preventDefault();
@@ -76,7 +82,7 @@ const SignUp = memo(( props )=>{
     }
 
     dispatch( actionSignUp( userinfo ) );
-  }, []);
+  }, [ dispatch ]);
 
   useEffect(()=>{
     console.log('[SingUp][current]', signed, success );

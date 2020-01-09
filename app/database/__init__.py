@@ -3,7 +3,7 @@ from functools import wraps
 from pymongo import MongoClient, errors
 from bson.objectid import ObjectId
 
-from app.config import MongoConf
+from app.config import MONGO_URL
 from app.utils.logger import logger
 
 class MongoDB(object):
@@ -20,7 +20,7 @@ class MongoDB(object):
 
         try:
             for trying in range(1, retry+1):
-                client = MongoClient( MongoConf.URL )
+                client = MongoClient( MONGO_URL )
                 try:
                     info = client.server_info()
                     #logger.info( info )

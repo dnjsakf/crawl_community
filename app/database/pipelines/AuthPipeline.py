@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.utils.crypt import AESCipher
 from app.exceptions import AuthException
 
@@ -20,6 +22,7 @@ class AuthPipeline(object):
 
     if not exists:
       userinfo['password'] = AESCipher( secret_key ).encrypt_str( userinfo['password'] )
+      userinfo['regDate'] = datetime.now().strftime('%Y%m%d%H%M%S')
 
       result = cls.client['test']['users'].insert_one( userinfo )
 

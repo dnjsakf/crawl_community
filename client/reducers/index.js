@@ -1,14 +1,15 @@
 import { combineReducers } from 'redux';
 import crudReducer from './crud';
 import { signReducer } from './auth';
-import { tabsReducer } from './event';
-import { communitiesReducer } from './cnts';
+import { tabsReducer, menusReducer } from './event';
+import { communitiesReducer, usersReducer } from './cnts';
 
 const rootReducer = combineReducers({
-  crud: crudReducer
-  , sign: signReducer
+  sign: signReducer
   , communities: communitiesReducer
   , tabs: tabsReducer
+  , menus: menusReducer
+  , users: usersReducer
 });
 
 export default rootReducer;

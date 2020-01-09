@@ -11,6 +11,10 @@ drivers
 project.egg*
 __pycache__
 
+app/config
+
+ mongo.py
+
 node_modules
 
 make_cookie.py

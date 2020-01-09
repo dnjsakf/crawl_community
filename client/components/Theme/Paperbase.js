@@ -1,5 +1,6 @@
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { createSelector } from 'reselect';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -8,43 +9,11 @@ import { createMuiTheme, ThemeProvider, withStyles } from '@material-ui/core/sty
 /* Components */
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import Box from '@material-ui/core/Box';
 
 import Navigator from './Navigator';
-import { Content, Communities } from '../Contents';
+import { Authentication, Management, Copyright } from '../Contents';
 import Header from './Header';
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <Typography
-      component="div"
-      role="tabpanel"
-      hidden={value !== index}
-      id={`wrapped-tabpanel-${index}`}
-      aria-labelledby={`wrapped-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box>{children}</Box>}
-    </Typography>
-  );
-}
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link to="/" color="inherit">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { TabPanel } from './../Contents/Tabs/TabPanels';
 
 let theme = createMuiTheme({
   palette: {
@@ -183,47 +152,82 @@ const styles = {
     padding: theme.spacing(2),
     background: '#eaeff1',
   },
+  tabs: {
+    backgroundColor: theme.palette.primary.main, 
+    color: theme.palette.common.white,
+  }
 };
+
+const navigatorSelector = createSelector(
+  ( state )=>( state.menus.navigator ),
+  ( res )=>({
+    activeNaviIndex: res.index
+    , activeNaviId: res.active
+    , activeNaviLabel: res.label
+  })
+);
 
 const Paperbase = memo(( props )=>{
   const { classes } = props;
-  const [ mobileOpen, setMobileOpen ] = useState(false);
-  const { value } = useSelector((state)=>{ console.log( state );  return  state.tabs.header });
+
+  const [ mobileOpen, setMobileOpen ] = useState( false );
+
+  const { activeNaviIndex, activeNaviId, activeNaviLabel } = useSelector( navigatorSelector );
 
   const handleDrawerToggle = useCallback(()=>{
     setMobileOpen(!mobileOpen);
+  }, []);
+
+  useEffect(()=>{
+    console.log( '[Paperbase][activeNavi][current]', activeNaviIndex, activeNaviId, activeNaviLabel );
+    return ()=>{
+      console.log( '[Paperbase][activeNavi][prev]', activeNaviIndex, activeNaviId, activeNaviLabel );
+    }
+  }, [ activeNaviIndex, activeNaviId, activeNaviLabel ]);
+
+  useEffect(()=>{
+    console.log( '[Paperbase][mobileOpen][current]', mobileOpen );
+    return ()=>{
+      console.log( '[Paperbase][mobileOpen][prev]', mobileOpen );
+    }
   }, [ mobileOpen ]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={classes.root}>
+    <ThemeProvider theme={ theme }>
+      <div className={ classes.root }>
         <CssBaseline />
-        <nav className={classes.drawer}>
+        {/* Navigator */}
+        <nav className={ classes.drawer }>
           <Hidden smUp implementation="js">
             <Navigator
               PaperProps={{ style: { width: drawerWidth } }}
               variant="temporary"
-              open={mobileOpen}
-              onClose={handleDrawerToggle}
+              open={ mobileOpen }
+              onClose={ handleDrawerToggle }
             />
           </Hidden>
           <Hidden xsDown implementation="css">
-            <Navigator PaperProps={{ style: { width: drawerWidth } }} />
+            <Navigator 
+              PaperProps={{ style: { width: drawerWidth } }} 
+            />
           </Hidden>
         </nav>
-        <div className={classes.app}>
-          <Header onDrawerToggle={handleDrawerToggle}/>
-          <main className={classes.main}>
-            <TabPanel value={value} index={0} >
-              <Content/>
+        {/* Contents */}
+        <div className={ classes.app }>
+          <Header 
+            onDrawerToggle={ handleDrawerToggle }
+            activeNaviLabel={ activeNaviLabel }
+          />
+          <React.Fragment>
+            <TabPanel active={ activeNaviIndex } index={ 0 }>
+              <Authentication />
             </TabPanel>
-            <TabPanel value={value} index={1} >
-              <div>
-                <Communities/>
-              </div>
+            <TabPanel active={ activeNaviIndex } index={ 1 }>
+              <Management />
             </TabPanel>
-          </main>
-          <footer className={classes.footer}>
+          </React.Fragment>
+
+          <footer className={ classes.footer }>
             <Copyright />
           </footer>
         </div>

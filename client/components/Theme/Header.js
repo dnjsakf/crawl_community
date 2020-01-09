@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { createSelector } from 'reselect';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { actionSignOut } from './../../reducers/auth/sign';
-import { actionChangeTabsHeader } from './../../reducers/event/tabs';
 
 /* Components */
 import AppBar from '@material-ui/core/AppBar';
@@ -12,8 +12,6 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
@@ -104,21 +102,19 @@ const styles = theme => ({
   },
 });
 
-function a11yProps(index) {
-  return {
-    'id': `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+const signSelector = createSelector(
+  ( state )=>( state.sign ),
+  ( res )=>( res.signed )
+);
 
 const Header = memo((props)=>{
-  const { classes, onDrawerToggle } = props;
+  const { classes, onDrawerToggle, activeNaviLabel, ...other } = props;
   const dispatch = useDispatch();
 
   const [ anchorEl, setAnchorEl ] = useState(null);
   const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
-  const { signed } = useSelector(( state )=>( state.sign ));
-  const { value } = useSelector(( state )=>( state.tabs.header ));
+
+  const signed = useSelector( signSelector );
 
   const isMenuOpen = Boolean( anchorEl );
   const isMobileMenuOpen = Boolean( mobileMoreAnchorEl );
@@ -149,14 +145,13 @@ const Header = memo((props)=>{
     } else {
       props.history.push('/auth/'+page);
     }
-  }, [ ]);
-
-  const handleChangeTab = useCallback((event, newValue)=>{
-    dispatch(actionChangeTabsHeader(newValue));
-  }, [ value ]);
+  }, [ dispatch ]);
 
   useEffect(()=>{
-    console.log('[SearchAppBar][signed]', signed);
+    console.log( '[Header][signed][current]', signed );
+    return ()=>{
+      console.log( '[Header][signed][prev]', signed );
+    }
   }, [ signed ]);
 
   const menuId = 'primary-search-account-menu';
@@ -278,7 +273,7 @@ const Header = memo((props)=>{
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
-                Authentication
+                { activeNaviLabel }
               </Typography>
             </Grid>
             <Grid item>
@@ -296,21 +291,8 @@ const Header = memo((props)=>{
           </Grid>
         </Toolbar>
       </AppBar>
-      <AppBar
-        component="div"
-        className={classes.secondaryBar}
-        color="primary"
-        position="static"
-        elevation={0}
-      >
-        <Tabs value={value} onChange={handleChangeTab} textColor="inherit">
-          <Tab textColor="inherit" label="Users" {...a11yProps(0)}/>
-          <Tab textColor="inherit" label="Sign-in method" {...a11yProps(1)} />
-          <Tab textColor="inherit" label="Templates" {...a11yProps(2)}/>
-          <Tab textColor="inherit" label="Usage" {...a11yProps(3)}/>
-        </Tabs>
-      </AppBar>
       { renderMenu }
+      { renderMobileMenu }
     </>
   );
 });

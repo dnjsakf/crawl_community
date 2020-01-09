@@ -8,12 +8,12 @@ from app import app
 from flask import jsonify, request, make_response
 from functools import wraps
 from datetime import datetime, timedelta
+
+from werkzeug.exceptions import Unauthorized
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from app.exceptions import AuthException
 
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
-
 class AuthDecorator(object):
-
   @staticmethod
   def token_requred( func ):
     @wraps( func )
@@ -68,11 +68,10 @@ class AuthDecorator(object):
           client = connect_redis()
           client.set(refresh_id, refresh_token)
 
-        except (redis.ConnectionError, redis.TimeoutError, redis.BusyLoadingError) as e:
-          app.logger.info(f'[Redis][Error] {e}')
+        # except (redis.ConnectionError, redis.TimeoutError, redis.BusyLoadingError) as e:
+        #   raise Unauthorized(description=e)
         except Exception as e:
-          app.logger.error( e )
-          raise e
+          raise Unauthorized(description=str(e))
 
         data['token'] = refresh_id
 
@@ -110,8 +109,7 @@ class AuthDecorator(object):
         response.set_cookie('access_token', value=access_token, httponly=True, expires=cookie_expire)
 
       except Exception as e:
-        app.logger.error( e )
-        raise e
+        raise Unauthorized(description=e)
 
       return response, status_code
     return wrapper
@@ -150,10 +148,10 @@ def connect_redis():
   redis_db = app.config['REDIS_DB']
   redis_timeout = app.config['REDIS_TIMEOUT']
 
-  client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db, socket_timeout=redis_timeout)
-
+  client = None
   try:
-    client.ping()
+    client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db, socket_timeout=redis_timeout)
+    app.logger.info( f'ping { client.ping() }' )
   except Exception as e:
     raise e
 

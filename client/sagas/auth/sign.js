@@ -65,10 +65,9 @@ function* handleSignIn({ payload }){
       , payload: result.data
     });
   } catch ( error ){
-    console.log(error.response);
     yield put({
       type: SIGN_IN_FAILURE
-      , payload: error.response.data
+      , payload: error.response
     })
   } 
 }
@@ -82,10 +81,9 @@ function* handleSignUp({ payload }){
       , payload: result.data
     });
   } catch ( error ){
-    console.log(error.response);
     yield put({
       type: SIGN_UP_FAILURE
-      , payload: error.response.data
+      , payload: error.response
     })
   } 
 }
@@ -99,10 +97,9 @@ function* handleSignOut({ payload }){
       , payload: result.data
     });
   } catch ( error ){
-    console.log(error.response);
     yield put({
       type: SIGN_OUT_FAILURE
-      , payload: error.response.data
+      , payload: error.response
     });
   }
 }
@@ -116,9 +113,13 @@ function* handleSignCheck({ payload }){
       , payload: result.data
     });
   } catch ( error ){
-    console.log( error.response );
-    const payload = error.response.data.payload;
-    if( payload && payload['refresh'] ){
+    let doRefresh = false;
+    if( error.response && error.response.data ){
+      const keys = Object.keys( error.response.data );
+      doRefresh = keys.indexOf('refresh') > -1;
+    }
+
+    if( doRefresh ){
       const token = localStorage.getItem('token');
       yield put({
         type: REFRESH_TOKEN
@@ -127,7 +128,7 @@ function* handleSignCheck({ payload }){
     } else {
       yield put({
         type: SIGN_CHECK_FAILURE
-        , payload: error.response.data
+        , payload: error.response
       });
     }
   }
@@ -144,7 +145,7 @@ function* handleRefreshToken({ payload }){
   } catch ( error ) {
     yield put({
       type: REFRESH_TOKEN_FAILURE
-      , payload: error.response.data
+      , payload: error.response
     });
   }
 }

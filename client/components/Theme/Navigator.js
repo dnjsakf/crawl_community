@@ -1,5 +1,11 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useCallback, useEffect } from 'react';
+import { useSelector, useDispatch, useStore } from 'react-redux';
+import { createSelector } from 'reselect';
+import { actionChangeNaviMenu } from './../../reducers/event/menus';
+
 import { withRouter, Link } from 'react-router-dom';
+
+import categories from './../Common/Menus/NavigartorMenu';
 
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -16,37 +22,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 /* Icons */
 import HomeIcon from '@material-ui/icons/Home';
-import PeopleIcon from '@material-ui/icons/People';
-import DnsRoundedIcon from '@material-ui/icons/DnsRounded';
-import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
-import PublicIcon from '@material-ui/icons/Public';
-import SettingsEthernetIcon from '@material-ui/icons/SettingsEthernet';
-import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
-import TimerIcon from '@material-ui/icons/Timer';
-import SettingsIcon from '@material-ui/icons/Settings';
-import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
 
-const categories = [
-  {
-    id: 'Develop',
-    children: [
-      { id: 'Authentication', icon: <PeopleIcon />,active: true },
-      { id: 'Database', icon: <DnsRoundedIcon /> },
-      { id: 'Storage', icon: <PermMediaOutlinedIcon /> },
-      { id: 'Hosting', icon: <PublicIcon /> },
-      { id: 'Functions', icon: <SettingsEthernetIcon /> },
-      { id: 'ML Kit', icon: <SettingsInputComponentIcon /> },
-    ],
-  },
-  {
-    id: 'Quality',
-    children: [
-      { id: 'Analytics', icon: <SettingsIcon /> },
-      { id: 'Performance', icon: <TimerIcon /> },
-      { id: 'Test Lab', icon: <PhonelinkSetupIcon /> },
-    ],
-  },
-];
+import RednerIcons from './../Common/RenderIcons';
 
 const styles = ( theme )=>({
   categoryHeader: {
@@ -89,14 +66,60 @@ const styles = ( theme )=>({
   },
 });
 
+function makeMenu({ classes, cate, icon, children }){
+  const isTopMenu = cate.id.indexOf('.') === -1;
+  return children.map((  )=>(
+    <ListItem 
+      key={ cCcate.id }
+      className={classes.categoryHeader}
+    >
+      { icon && <ListItemIcon className={classes.itemIcon}>{ icon }</ListItemIcon> }
+      <ListItemText
+        classes={{
+          primary: classes.categoryHeaderPrimary,
+        }}
+      >
+        { cate.label }
+      </ListItemText>
+    </ListItem>
+  ));
+}
+
+const navigatorSelector = createSelector(
+  ( state )=>( state.menus.navigator ),
+  ( res )=>({
+    activeNaviIndex: res.index
+    , activeNaviId: res.active
+    , activeNaviLabel: res.label
+  })
+);
+
 const Navigator = memo(( props )=>{
   const { classes, staticContext, ...other } = props;
+  const dispatch = useDispatch();
+
+  const { activeNaviIndex, activeNaviId } = useSelector( navigatorSelector );
+
+  const handleChangeNaviMenu = useCallback( ( index, current, label )=>( event )=>{
+    dispatch(actionChangeNaviMenu({
+      index: index
+      , active: current 
+      , label: label
+    }));
+  }, [ dispatch ] );
+
+  useEffect(()=>{
+    console.log( '[Navigator][activeNavi][current]', activeNaviIndex, activeNaviId );
+    return ()=>{
+      console.log( '[Navigator][activeNavi][prev]', activeNaviIndex, activeNaviId );
+    }
+  }, [ activeNaviIndex, activeNaviId ]);
 
   return (
     <Drawer variant="permanent" {...other} >
       <List disablePadding>
         <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>
-          <Link to="/auth/signin" variant="body2">
+          <Link to="/" variant="body2">
             Paperbase
           </Link>
         </ListItem>
@@ -112,35 +135,39 @@ const Navigator = memo(( props )=>{
             Project Overview
           </ListItemText>
         </ListItem>
-        {categories.map(({ id, children }) => (
-          <React.Fragment key={id}>
-            <ListItem className={classes.categoryHeader}>
+        {categories.map(({ cate, children }, pIndex) => (
+          <React.Fragment key={ cate.id }>
+            <ListItem className={ classes.categoryHeader }>
               <ListItemText
                 classes={{
                   primary: classes.categoryHeaderPrimary,
                 }}
               >
-                {id}
+                { cate.label }
               </ListItemText>
             </ListItem>
-            {children.map(({ id: childId, icon, active }) => (
-              <ListItem
-                key={childId}
-                button
-                className={clsx(classes.item, active && classes.itemActiveItem)}
-              >
-                <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
-                <ListItemText
-                  classes={{
-                    primary: classes.itemPrimary,
-                  }}
+            {children.map(({ cate: cCcate, icon }, index) => {
+              const isActive = activeNaviId ? cCcate.id === activeNaviId : index === 0;
+              
+              return (
+                <ListItem
+                  key={ cCcate.id }
+                  button
+                  className={clsx( classes.item, isActive && classes.itemActiveItem )}
+                  onClick={ handleChangeNaviMenu( index, cCcate.id, cCcate.label ) }
                 >
-                  {childId}
-                </ListItemText>
-              </ListItem>
-            ))}
-
-            <Divider className={classes.divider} />
+                  { icon && <ListItemIcon className={ classes.itemIcon }>{ RednerIcons( icon ) }</ListItemIcon> }
+                  <ListItemText
+                    classes={{
+                      primary: classes.itemPrimary,
+                    }}
+                  >
+                    { cCcate.label } 
+                  </ListItemText>
+                </ListItem>
+              )
+            })}
+            <Divider className={ classes.divider } />
           </React.Fragment>
         ))}
       </List>

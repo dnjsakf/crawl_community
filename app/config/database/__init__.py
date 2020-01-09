@@ -1,3 +1,3 @@
-import app.config.database.mongodb as conf
+import app.config.database.mongo as mongo
 
-URL = f'mongodb://{conf.USERNAME}:{conf.PASSWORD}@{conf.HOST}/{conf.DATABASE}?{conf.OPTIONS}'
+MONGO_URL = f'{mongo.MODULE}://{mongo.USERNAME}:{mongo.PASSWORD}@{mongo.HOST}/{mongo.DATABASE}?{mongo.OPTIONS}'
