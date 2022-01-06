@@ -2,7 +2,7 @@ amqp==2.5.2
 attrs==19.3.0
 Automat==0.8.0
 billiard==3.6.1.0
-celery==4.3.0
+celery==5.2.2
 cffi==1.13.1
 Click==7.0
 constantly==15.1.0
